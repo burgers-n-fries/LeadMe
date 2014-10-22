@@ -32,8 +32,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Zoom To Scale"
-        android:id="@+id/zoom"
+        android:text="Start"
+        android:id="@+id/Start"
         android:layout_alignTop="@+id/directions"
         android:layout_alignParentStart="true" />
 

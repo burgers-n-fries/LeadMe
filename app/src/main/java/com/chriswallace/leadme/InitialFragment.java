@@ -32,6 +32,7 @@ import java.util.List;
 public class InitialFragment extends Fragment {
     GoogleMap map;
     public InitialFragment() {
+        this.map = null;
     }
 
     @Override
@@ -39,27 +40,30 @@ public class InitialFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final Button searchDirections = (Button) rootView.findViewById(R.id.directions);
-        final Button zoom = (Button) rootView.findViewById(R.id.zoom);
+        final Button start = (Button) rootView.findViewById(R.id.Start);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
         MapFragment frag = (MapFragment)getActivity().getFragmentManager().findFragmentById(R.id.map);
-        map = frag.getMap();
+        this.map =frag.getMap();
         Log.d("MAP",map.toString());
         LocationManager mLocationManager = (LocationManager)getActivity().getSystemService(getActivity().LOCATION_SERVICE);
         Location lastLocal = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastLocal != null) {
             Log.d("LOCATION",lastLocal.toString());
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
+        //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, mLocationListener);
            // MapsInitializer.initialize(this.getActivity());
 
 
 
-        zoom.setOnClickListener(new View.OnClickListener() {
+        start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("BEGIN","STARTING DIRECTIONS");
+                MapFunctions.zoomMap(map,new LatLng(42.291022, -71.265235), 16.0f);
+                //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
 
             }
         });
@@ -79,65 +83,9 @@ public class InitialFragment extends Fragment {
 
 
     }
-    public void drawRoute(List<List<HashMap<String,String>>> points){
-        List yo = points.get(0);
-        Log.d("TEST",points.get(0).get(0).get("lng"));
-        PolylineOptions route = new PolylineOptions();
 
 
-        int i;
-        Log.d("THIS",points.get(0).toString());
-        double minLat = 100000;
-        double minLong = 100000;
-        double maxLong = -10000;
-        double maxLat = -10000;
-        if (points.size() == 1) {
-            Log.d("ONLY","ONE LONG");
-            for (i = 0; i < points.get(0).size(); i++) {
-                String lat = points.get(0).get(i).get("lat");
-                String lng = points.get(0).get(i).get("lng");
-                double lati = Double.parseDouble(lat);
-                double longi = Double.parseDouble(lng) ;
-                Log.d(lat, lng);
-                route.add(new LatLng(lati,longi));
-                // VALUES TO SET AS BOUNDS
-                if (minLat > lati) {
-                    minLat = lati;
-                }
-                else if (maxLat < lati) {
-                    maxLat = lati;
-                }
 
-                if (minLong > longi) {
-                    minLong = longi;
-                }
-                else if (maxLong < longi) {
-                    maxLong = longi;
-                }
-            }
-            LatLngBounds bounds = new LatLngBounds(new LatLng(minLat,minLong),new LatLng(maxLat,maxLong));
-            map.addPolyline(route);
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,30));
-        }
-        else {
-            for (i = 0; i < points.size(); i++) {
-                int j;
-                for (j = 0; j < points.get(i).size(); i++) {
-                    String lat = points.get(i).get(j).get("lat");
-                    String lng = points.get(i).get(j).get("lng");
-                    Log.d(lat, lng);
-                    //route.add(new LatLng());
-                    //UPDATE THIS TO DO SAME AS ABOVE
-                }
-            }
-        }
-
-
-    }
-
-    public void zoomMap(){
-
-    }
 
     private final LocationListener mLocationListener = new LocationListener() {
         @Override

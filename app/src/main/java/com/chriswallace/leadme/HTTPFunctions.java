@@ -44,7 +44,7 @@ public class HTTPFunctions {
                         Log.d("REULTS",results.toString());
                         Fragment frag = activity.getFragmentManager().findFragmentByTag("Map");
                         InitialFragment Mapfrag = (InitialFragment)frag;
-                        Mapfrag.drawRoute(results);
+                        MapFunctions.drawRoute(Mapfrag.map,results);
 
                     }
                 },
