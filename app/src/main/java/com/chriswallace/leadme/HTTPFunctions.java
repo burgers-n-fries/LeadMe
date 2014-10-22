@@ -10,9 +10,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,9 +33,13 @@ public class HTTPFunctions {
     }//ALWAYS PASS IN getActivity
 
     public void directionSearch(String URL) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
+        final MainActivity activity = (MainActivity)context;
+        LatLng latlong = activity.location;
+
         URL = URL.replaceAll(" ", "+"); // for proper url functionality
-        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=1000+Olin+Way+Needham+MA&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
-        final MainActivity activity = ((MainActivity) HTTPFunctions.this.context);
+        //URL = "https://maps.googleapis.com/maps/api/directions/json?origin=1000+Olin+Way+Needham+MA&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
+        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latlong.latitude + "," + latlong.longitude + "&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
+
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -44,7 +50,9 @@ public class HTTPFunctions {
                         Log.d("REULTS",results.toString());
                         Fragment frag = activity.getFragmentManager().findFragmentByTag("Map");
                         InitialFragment Mapfrag = (InitialFragment)frag;
-                        MapFunctions.drawRoute(Mapfrag.map,results);
+                        ArrayList<LatLng> waypoints= MapFunctions.drawRoute(Mapfrag.map, results);
+                        activity.WaypointList = waypoints;
+                        activity.mapInitialized = true;
 
                     }
                 },

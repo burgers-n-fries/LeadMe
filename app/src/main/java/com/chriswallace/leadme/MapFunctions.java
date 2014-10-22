@@ -4,10 +4,12 @@ import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,11 +17,13 @@ import java.util.List;
  * Created by cwallace on 10/22/14.
  */
 public class MapFunctions {
+
     public static void reboundMap(GoogleMap map, LatLngBounds bounds){
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
     }
 
-    public static void drawRoute(GoogleMap map, List<List<HashMap<String,String>>> points){
+    public static ArrayList<LatLng> drawRoute(GoogleMap map, List<List<HashMap<String,String>>> points){
+        ArrayList<LatLng> waypoints = new ArrayList<LatLng>();
         List yo = points.get(0);
         Log.d("TEST", points.get(0).get(0).get("lng"));
         PolylineOptions route = new PolylineOptions();
@@ -38,8 +42,9 @@ public class MapFunctions {
                 String lng = points.get(0).get(i).get("lng");
                 double lati = Double.parseDouble(lat);
                 double longi = Double.parseDouble(lng) ;
-                Log.d(lat, lng);
+
                 route.add(new LatLng(lati,longi));
+                waypoints.add(new LatLng(lati,longi));
                 // VALUES TO SET AS BOUNDS
                 if (minLat > lati) {
                     minLat = lati;
@@ -59,6 +64,7 @@ public class MapFunctions {
             map.addPolyline(route);
             reboundMap(map,bounds);
 
+
         }
         else {
             for (i = 0; i < points.size(); i++) {
@@ -73,10 +79,15 @@ public class MapFunctions {
             }
         }
 
-
+        return waypoints;
     }
 
     public static void zoomMap(GoogleMap map, LatLng center, float zoom){
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, zoom));
+    }
+
+    public static void drawCircle(GoogleMap map, LatLng center){
+        CircleOptions circle = new CircleOptions().center(center).radius(2);
+        map.addCircle(circle);
     }
 }

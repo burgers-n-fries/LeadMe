@@ -54,15 +54,17 @@ public class InitialFragment extends Fragment {
         }
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,200,1,coarseLocationListener);
            // MapsInitializer.initialize(this.getActivity());
 
 
 
         start.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                Log.d("BEGIN","STARTING DIRECTIONS");
-                MapFunctions.zoomMap(map,new LatLng(42.291022, -71.265235), 16.0f);
+                Log.d("BEGIN", "STARTING DIRECTIONS");
+                MapFunctions.zoomMap(map,activity.location, 16.0f);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
 
             }
@@ -91,7 +93,51 @@ public class InitialFragment extends Fragment {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("LOCATION",location.toString());
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+
+
+            MainActivity activity = (MainActivity)getActivity();
+            if (activity.started == true) {
+                MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
+            }
+            if (activity.mapInitialized == false){
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                activity.mapInitialized = true;
+            }
+            activity.location = new LatLng(location.getLatitude(), location.getLongitude());
+            MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
+            //your code here
+        }
+
+        public void onProviderEnabled(String Provider){
+            Log.d("YO","PROVIDER ENABLED");
+        }
+
+        public void onProviderDisabled(String Provider){
+            Log.d("YO","PROVIDER DISABLED");
+        }
+
+        public void onStatusChanged(String LocationServices, int status, Bundle extras){
+            Log.d("ERROR","THE GPS WENT AWAY");
+            //CREATE A MESSAGE TELLING SUER TO TURN GPS BACK ON
+        }
+    };
+
+    private final LocationListener coarseLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            Log.d("COARSELOCATION",location.toString());
+
+
+            MainActivity activity = (MainActivity)getActivity();
+            if (activity.started == true) {
+                MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
+            }
+            if (activity.mapInitialized == false){
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                activity.mapInitialized = true;
+            }
+            activity.location = new LatLng(location.getLatitude(), location.getLongitude());
+            MapFunctions.drawCircle(map,activity.location);
             //your code here
         }
 

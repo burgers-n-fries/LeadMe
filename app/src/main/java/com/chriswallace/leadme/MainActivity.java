@@ -20,15 +20,29 @@ import android.view.ViewGroup;
 import android.os.Build;
 
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
 
 public class MainActivity extends FragmentActivity {
+    LatLng location;
+    ArrayList<LatLng> WaypointList;
+    Boolean started;
+    Boolean mapInitialized;
 
+    public MainActivity(){
+        this.location = null;
+        this.WaypointList = null;
+        this.started = false;
+        this.mapInitialized = false;
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
