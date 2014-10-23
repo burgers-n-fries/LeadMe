@@ -90,4 +90,16 @@ public class MapFunctions {
         CircleOptions circle = new CircleOptions().center(center).radius(2);
         map.addCircle(circle);
     }
+
+    public static void clearMapRedraw(GoogleMap map, LatLng center ,ArrayList<LatLng> waypoints){
+        map.clear();
+        int i;
+        PolylineOptions route = new PolylineOptions();
+        for (i = 0; i < waypoints.size();i++){
+
+            route.add(waypoints.get(i));
+        }
+        map.addPolyline(route);
+        drawCircle(map,center);
+    }
 }

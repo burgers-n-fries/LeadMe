@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 
@@ -38,7 +39,7 @@ public class InitialFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final Button searchDirections = (Button) rootView.findViewById(R.id.directions);
         final Button start = (Button) rootView.findViewById(R.id.Start);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
@@ -74,8 +75,11 @@ public class InitialFragment extends Fragment {
         searchDirections.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditText addressText = (EditText) rootView.findViewById(R.id.DestinationText);
+                String address = addressText.getText().toString();
+                //SHOULD I CLEAR TEXT??
                 HTTPFunctions http = new HTTPFunctions(getActivity());
-                http.directionSearch("THIS IS A TEST");
+                http.directionSearch(address);
             }
         });
 
@@ -104,7 +108,19 @@ public class InitialFragment extends Fragment {
                 activity.mapInitialized = true;
             }
             activity.location = new LatLng(location.getLatitude(), location.getLongitude());
-            MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
+            if (activity.WaypointList != null) {
+                MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
+
+                //MapFunctions.drawCircle(map,activity.location);
+                //your code here
+                double LatDif = activity.location.latitude - activity.WaypointList.get(0).latitude;
+                double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
+                //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
+                Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
+                Double NorthAngle = (360 - angle + 90 ) % 360;
+                Log.d("ANGLE", NorthAngle.toString());
+            }
+            //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
             //your code here
         }
 
@@ -137,8 +153,18 @@ public class InitialFragment extends Fragment {
                 activity.mapInitialized = true;
             }
             activity.location = new LatLng(location.getLatitude(), location.getLongitude());
-            MapFunctions.drawCircle(map,activity.location);
-            //your code here
+            if (activity.WaypointList != null) {
+                MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
+
+                //MapFunctions.drawCircle(map,activity.location);
+                //your code here
+                double LatDif = activity.location.latitude - activity.WaypointList.get(0).latitude;
+                double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
+                //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
+                Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
+                Double NorthAngle = (360 - angle + 90 ) % 360;
+                Log.d("ANGLE", NorthAngle.toString());
+            }
         }
 
         public void onProviderEnabled(String Provider){

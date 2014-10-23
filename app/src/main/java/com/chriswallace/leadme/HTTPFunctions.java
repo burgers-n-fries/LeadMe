@@ -32,13 +32,13 @@ public class HTTPFunctions {
         this.queue = Volley.newRequestQueue(context);
     }//ALWAYS PASS IN getActivity
 
-    public void directionSearch(String URL) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
+    public void directionSearch(String Destination) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
         final MainActivity activity = (MainActivity)context;
         LatLng latlong = activity.location;
-
-        URL = URL.replaceAll(" ", "+"); // for proper url functionality
+        String URL;
+        Destination = Destination.replaceAll(" ", "+"); // for proper url functionality
         //URL = "https://maps.googleapis.com/maps/api/directions/json?origin=1000+Olin+Way+Needham+MA&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
-        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latlong.latitude + "," + latlong.longitude + "&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
+        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latlong.latitude + "," + latlong.longitude + "&destination=" + Destination + "&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
 
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
                 new Response.Listener<JSONObject>() {
