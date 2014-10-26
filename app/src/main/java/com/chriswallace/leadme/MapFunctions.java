@@ -102,4 +102,23 @@ public class MapFunctions {
         map.addPolyline(route);
         drawCircle(map,center);
     }
+
+    public static double calculateDistance(LatLng c1, LatLng c2){
+        //HAVERSINE FORMULA
+        int R = 6371;
+        double lat1 = Math.toRadians(c1.latitude);
+        double lat2 = Math.toRadians(c2.latitude);
+        double long1 = Math.toRadians(c1.latitude);
+        double long2 = Math.toRadians(c2.latitude);
+        double latDif = lat2-lat1;
+        double longDif = long2-long1;
+        double a = Math.pow(Math.sin(latDif/2),2) + Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(longDif/2),2);
+        double c = 2* Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        return R*c;
+
+    }
+
 }
+
+
+

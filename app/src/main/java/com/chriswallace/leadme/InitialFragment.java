@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class InitialFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final Button searchDirections = (Button) rootView.findViewById(R.id.directions);
         final Button start = (Button) rootView.findViewById(R.id.Start);
+        final Button write = (Button) rootView.findViewById(R.id.write);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
@@ -66,7 +68,25 @@ public class InitialFragment extends Fragment {
             public void onClick(View v) {
                 Log.d("BEGIN", "STARTING DIRECTIONS");
                 MapFunctions.zoomMap(map,activity.location, 16.0f);
+                MapFunctions.clearMapRedraw(map, activity.location ,activity.WaypointList);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
+
+            }
+        });
+
+        write.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                byte one = 1;
+                byte two = 2;
+
+                byte[] b = "angle@45!".getBytes(Charset.forName("ASCII"));
+
+
+
+                activity.mConnectThread.mConnectedThread.write(b);
+                //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
             }
         });
@@ -117,7 +137,8 @@ public class InitialFragment extends Fragment {
                 double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
                 //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
                 Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
-                Double NorthAngle = (360 - angle + 90 ) % 360;
+                //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOUDL VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
+                Double NorthAngle = (angle + 90 ) % 360;
                 Log.d("ANGLE", NorthAngle.toString());
             }
             //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
@@ -162,8 +183,19 @@ public class InitialFragment extends Fragment {
                 double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
                 //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
                 Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
-                Double NorthAngle = (360 - angle + 90 ) % 360;
+                Double NorthAngle = (angle + 90 ) % 360;
+
                 Log.d("ANGLE", NorthAngle.toString());
+                String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL",b.toString());
+                if (activity.mConnectThread != null &&  activity.mConnectThread.mConnectedThread != null) {
+                    activity.mConnectThread.mConnectedThread.write(b);
+                }
+                else {
+                    Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
+                }
+
             }
         }
 

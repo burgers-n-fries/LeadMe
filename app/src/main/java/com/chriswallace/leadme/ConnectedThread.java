@@ -3,6 +3,7 @@ package com.chriswallace.leadme;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,14 +70,17 @@ public class ConnectedThread extends Thread {
     }
 
     public void write(byte[] bytes) {
+        Log.d("WRITE","IN FUCNTION");
         try {
             mmOutStream.write(bytes);
+            Log.d("WROTE DATA", bytes.toString());
         } catch (IOException e) { }
     }
 
     public void cancel() {
         try {
             mmSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+        Log.d("FAILED TO WRITE","SAD");}
     }
 }

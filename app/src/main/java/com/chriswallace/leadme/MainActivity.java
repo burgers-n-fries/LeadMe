@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.ArrayAdapter;
 
 
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +36,8 @@ public class MainActivity extends FragmentActivity {
     ArrayList<LatLng> WaypointList;
     Boolean started;
     Boolean mapInitialized;
+    ConnectThread mConnectThread;
+
 
     public MainActivity(){
         this.location = null;
@@ -66,14 +69,18 @@ public class MainActivity extends FragmentActivity {
         if (pairedDevices.size() == 0) {
             Log.d("NO DEVICE","NO DEVICE FOUND");
         }
+
         Log.d("TEST","WITHIN ONCREATE");
         if (pairedDevices.size() > 0) {
             Log.d("SIZE","A PAIRED DEVICE EXISTS");
             for (BluetoothDevice device : pairedDevices) {
+                //MIGHT NEED TO HANDLE THIS DIFFERENT SINCE THIS IS A FOR LOOP
                 BluetoothDevice mDevice = device;
-                ConnectThread mConnectThread = new ConnectThread(mDevice);
+                Log.d("CREATEDACONNECTTHREAD","CREATEDACONNECTTHREAD");
+                mConnectThread = new ConnectThread(mDevice);
                 mConnectThread.run();
                 break;
+                //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         }
 
