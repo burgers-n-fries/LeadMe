@@ -129,17 +129,29 @@ public class InitialFragment extends Fragment {
             }
             activity.location = new LatLng(location.getLatitude(), location.getLongitude());
             if (activity.WaypointList != null) {
+
+                //REMOVE WAYPOINT IF YOU REACHED IT
+                Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
+                if (checkDistance < 40) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
+                    activity.WaypointList.remove(0);
+                }
+
+
                 MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
 
-                //MapFunctions.drawCircle(map,activity.location);
-                //your code here
-                double LatDif = activity.location.latitude - activity.WaypointList.get(0).latitude;
-                double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
-                //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
-                Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
-                //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOUDL VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
-                Double NorthAngle = (angle + 90 ) % 360;
+                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location);
                 Log.d("ANGLE", NorthAngle.toString());
+
+                //WRITE ANGLE TO BLUETOOTH
+                String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL",b.toString());
+                if (activity.mConnectThread != null &&  activity.mConnectThread.mConnectedThread != null) {
+                    activity.mConnectThread.mConnectedThread.write(b);
+                }
+                else {
+                    Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
+                }
             }
             //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
             //your code here
@@ -175,17 +187,19 @@ public class InitialFragment extends Fragment {
             }
             activity.location = new LatLng(location.getLatitude(), location.getLongitude());
             if (activity.WaypointList != null) {
+
+                Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
+                if (checkDistance < 40) {
+                    activity.WaypointList.remove(0);
+                }
+
+                //clear map and redraw with current location and waypoints.
                 MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
-
-                //MapFunctions.drawCircle(map,activity.location);
-                //your code here
-                double LatDif = activity.location.latitude - activity.WaypointList.get(0).latitude;
-                double LongDif = activity.location.longitude - activity.WaypointList.get(0).longitude;
-                //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
-                Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
-                Double NorthAngle = (angle + 90 ) % 360;
-
+                // Determine angle to vibrate
+                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location);
                 Log.d("ANGLE", NorthAngle.toString());
+
+                //WRITE THE ANGEL TO THE BLUETOOTH
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL",b.toString());

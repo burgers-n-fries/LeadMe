@@ -114,10 +114,36 @@ public class MapFunctions {
         double longDif = long2-long1;
         double a = Math.pow(Math.sin(latDif/2),2) + Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(longDif/2),2);
         double c = 2* Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-        return R*c;
+        Double test = R*c;
+        Log.d("AHFDSKJFSDGSDGSJGSDGJSJGKJDSF",test.toString());
+        return R*c*3280;
 
     }
 
+    public static double determineAngle(ArrayList<LatLng> waypoints, LatLng location){
+        //MAYBE COULD PASS IN DISTANCE SICNE WE DETERMINE IT IN AN EARLIER LOCATION
+        double distance = calculateDistance(location,waypoints.get(0));
+        if (distance < 100) {
+            //Code to change angle here... but for now
+            double LatDif = location.latitude - waypoints.get(0).latitude;
+            double LongDif = location.longitude - waypoints.get(0).longitude;
+            //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
+            Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
+            //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOULD VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
+            Double NorthAngle = (angle + 90 ) % 360;
+            return NorthAngle;
+
+        }
+        else{
+            double LatDif = location.latitude - waypoints.get(0).latitude;
+            double LongDif = location.longitude - waypoints.get(0).longitude;
+            //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
+            Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
+            //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOULD VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
+            Double NorthAngle = (angle + 90 ) % 360;
+            return NorthAngle;
+        }
+    }
 }
 
 
