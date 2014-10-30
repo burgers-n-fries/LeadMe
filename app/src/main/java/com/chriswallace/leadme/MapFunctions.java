@@ -19,23 +19,24 @@ import java.util.List;
 public class MapFunctions {
 
     public static void reboundMap(GoogleMap map, LatLngBounds bounds){
+        //CALLED TO BOUND THE MAP WHEN NEW DIRECTIONS ARE SEARCHED
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
     }
 
     public static ArrayList<LatLng> drawRoute(GoogleMap map, List<List<HashMap<String,String>>> points){
+        //DRAWS THE ROUTE ON THE ACTIVE MAP, CALLED WHEN YOU HIT DIRECTIONS
         ArrayList<LatLng> waypoints = new ArrayList<LatLng>();
-        List yo = points.get(0);
-        Log.d("TEST", points.get(0).get(0).get("lng"));
+
         PolylineOptions route = new PolylineOptions();
 
 
         int i;
         Log.d("THIS",points.get(0).toString());
-        double minLat = 100000;
+        double minLat = 100000; //ARBITRARY MIN MAXES
         double minLong = 100000;
         double maxLong = -10000;
         double maxLat = -10000;
-        if (points.size() == 1) {
+        if (points.size() == 1) { //FOR SOME REASON THIS ONCE ORGANIZED AS a 2D POINTS ARRAY, ADDED THIS CHECK STATEMENT TO HANDLE BOTH CASES, GNEREALLY THIS IS TRUE
             Log.d("ONLY","ONE LONG");
             for (i = 0; i < points.get(0).size(); i++) {
                 String lat = points.get(0).get(i).get("lat");
@@ -44,7 +45,7 @@ public class MapFunctions {
                 double longi = Double.parseDouble(lng) ;
 
                 route.add(new LatLng(lati,longi));
-                waypoints.add(new LatLng(lati,longi));
+                waypoints.add(new LatLng(lati,longi)); //ADD TO THE WAYPOINT LIST
                 // VALUES TO SET AS BOUNDS
                 if (minLat > lati) {
                     minLat = lati;
@@ -73,11 +74,32 @@ public class MapFunctions {
                     String lat = points.get(i).get(j).get("lat");
                     String lng = points.get(i).get(j).get("lng");
                     Log.d(lat, lng);
-                    //route.add(new LatLng());
-                    //UPDATE THIS TO DO SAME AS ABOVE
+                    double lati = Double.parseDouble(lat);
+                    double longi = Double.parseDouble(lng) ;
+
+                    route.add(new LatLng(lati,longi));
+                    waypoints.add(new LatLng(lati,longi));
+                    // VALUES TO SET AS BOUNDS
+                    if (minLat > lati) {
+                        minLat = lati;
+                    }
+                    else if (maxLat < lati) {
+                        maxLat = lati;
+                    }
+
+                    if (minLong > longi) {
+                        minLong = longi;
+                    }
+                    else if (maxLong < longi) {
+                        maxLong = longi;
+                    }
+                }
+                LatLngBounds bounds = new LatLngBounds(new LatLng(minLat,minLong),new LatLng(maxLat,maxLong));
+                map.addPolyline(route);
+                reboundMap(map,bounds);
                 }
             }
-        }
+
 
         return waypoints;
     }
@@ -104,7 +126,7 @@ public class MapFunctions {
     }
 
     public static double calculateDistance(LatLng c1, LatLng c2){
-        //HAVERSINE FORMULA
+        //HAVERSINE FORMULA, TRUST IN THE STACK OVERFLOW THAT THIS WORKS, SEEMS TO
         int R = 6371;
         double lat1 = Math.toRadians(c1.latitude);
         double lat2 = Math.toRadians(c2.latitude);
@@ -115,23 +137,30 @@ public class MapFunctions {
         double a = Math.pow(Math.sin(latDif/2),2) + Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(longDif/2),2);
         double c = 2* Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
         Double test = R*c;
-        Log.d("AHFDSKJFSDGSDGSJGSDGJSJGKJDSF",test.toString());
-        return R*c*3280;
+
+        return R*c*3280; //FEET PER KILOMETER, CONVERTING UNITS
 
     }
 
-    public static double determineAngle(ArrayList<LatLng> waypoints, LatLng location){
-        //MAYBE COULD PASS IN DISTANCE SICNE WE DETERMINE IT IN AN EARLIER LOCATION
-        double distance = calculateDistance(location,waypoints.get(0));
+    public static double determineAngle(ArrayList<LatLng> waypoints, LatLng location, double distance){
+
+        //double distance = calculateDistance(location,waypoints.get(0));
+
         if (distance < 100) {
+            // SLOWLY TAPER TOWARDS SECONDARY WAYPOINT AS YOU APROACH THE FIRST
+            double weight0 = distance/100;
+            double weight1 = (100 - distance)/100;
+
             //Code to change angle here... but for now
-            double LatDif = location.latitude - waypoints.get(0).latitude;
-            double LongDif = location.longitude - waypoints.get(0).longitude;
-            //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
-            Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
-            //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOULD VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
-            Double NorthAngle = (angle + 90 ) % 360;
-            return NorthAngle;
+            double LatDif0 = location.latitude - waypoints.get(0).latitude;
+            double LongDif0 = location.longitude - waypoints.get(0).longitude;
+            Double angle0 = (Math.toDegrees(Math.atan2(LongDif0, LatDif0))+90) % 360;
+
+            double LatDif1 = location.latitude - waypoints.get(1).latitude;
+            double LongDif1 = location.longitude - waypoints.get(1).longitude;
+            Double angle1 = (Math.toDegrees(Math.atan2(LongDif1, LatDif1))+90) % 360;
+
+            return angle0*weight0+weight1*angle1;
 
         }
         else{
@@ -144,6 +173,10 @@ public class MapFunctions {
             return NorthAngle;
         }
     }
+
+
+
+
 }
 
 

@@ -113,7 +113,7 @@ public class InitialFragment extends Fragment {
 
 
 
-    private final LocationListener mLocationListener = new LocationListener() {
+    private final LocationListener mLocationListener = new LocationListener() { //FINE LOCATION LISTERENER,
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("LOCATION",location.toString());
@@ -132,14 +132,14 @@ public class InitialFragment extends Fragment {
 
                 //REMOVE WAYPOINT IF YOU REACHED IT
                 Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
-                if (checkDistance < 40) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
+                if (checkDistance < 20) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
                     activity.WaypointList.remove(0);
                 }
 
 
                 MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
 
-                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location);
+                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location,checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
 
                 //WRITE ANGLE TO BLUETOOTH
@@ -164,14 +164,14 @@ public class InitialFragment extends Fragment {
         public void onProviderDisabled(String Provider){
             Log.d("YO","PROVIDER DISABLED");
         }
-
+        //THIS SHOULD PROMPT THE USER TO TURN BACK ON
         public void onStatusChanged(String LocationServices, int status, Bundle extras){
             Log.d("ERROR","THE GPS WENT AWAY");
             //CREATE A MESSAGE TELLING SUER TO TURN GPS BACK ON
         }
     };
 
-    private final LocationListener coarseLocationListener = new LocationListener() {
+    private final LocationListener coarseLocationListener = new LocationListener() { //COARSE LISTENER SHOULD NOT DO THESE THINGS ON REAL APP, ASEFUL FOR TESTING
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("COARSELOCATION",location.toString());
@@ -189,14 +189,14 @@ public class InitialFragment extends Fragment {
             if (activity.WaypointList != null) {
 
                 Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
-                if (checkDistance < 40) {
+                if (checkDistance < 20) {
                     activity.WaypointList.remove(0);
                 }
 
                 //clear map and redraw with current location and waypoints.
                 MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
                 // Determine angle to vibrate
-                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location);
+                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location, checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
 
                 //WRITE THE ANGEL TO THE BLUETOOTH
