@@ -119,7 +119,7 @@ public class InitialFragment extends Fragment {
             Log.d("LOCATION",location.toString());
 
 
-            MainActivity activity = (MainActivity)getActivity();
+            //GET DISTANCE FROM LINE, THEN RECALCULATE;
             if (App.app.started == true) {
                 MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
             }
@@ -133,6 +133,7 @@ public class InitialFragment extends Fragment {
                 //REMOVE WAYPOINT IF YOU REACHED IT
                 Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
                 if (checkDistance < 20) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
+                    App.app.previousWaypoint = App.app.WaypointList.get(0);
                     App.app.WaypointList.remove(0);
                 }
 

@@ -174,6 +174,18 @@ public class MapFunctions {
         }
     }
 
+    public static double recalculateCheck(LatLng location, LatLng pt1, LatLng pt2){
+
+        //CHECKS BY HOW MUCH YOU ARE OFF THE ROUTE BY.
+        double lineSlope = (pt1.longitude - pt2.longitude)/(pt1.latitude-pt2.latitude);
+        double invertedSlope =  -(pt1.latitude-pt2.latitude)/(pt1.longitude - pt2.longitude);
+        double intercept1 = pt1.longitude-lineSlope*pt1.latitude;
+        double intercept2 = location.longitude-invertedSlope*location.latitude;
+        double latpoi = (intercept1-intercept2)/(invertedSlope-lineSlope);
+        double longpoi = latpoi*lineSlope+intercept1;
+        return calculateDistance(new LatLng(latpoi,longpoi),location);
+    }
+
 
 
 

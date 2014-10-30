@@ -21,6 +21,8 @@ public class App extends Application {
     Boolean started;
     Boolean mapInitialized;
     ConnectThread mConnectThread;
+    Boolean onRoute;
+    LatLng previousWaypoint;
 
     @Override
     public void onCreate() {
@@ -29,6 +31,8 @@ public class App extends Application {
         this.WaypointList = null;
         this.started = false;
         this.mapInitialized = false;
+        this.onRoute = false;
+        previousWaypoint = null;
         app = this;
     }
 
