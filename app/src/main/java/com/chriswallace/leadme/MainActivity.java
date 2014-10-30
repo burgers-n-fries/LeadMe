@@ -32,18 +32,11 @@ import java.util.UUID;
 
 
 public class MainActivity extends FragmentActivity {
-    LatLng location;
-    ArrayList<LatLng> WaypointList;
-    Boolean started;
-    Boolean mapInitialized;
-    ConnectThread mConnectThread;
+
 
 
     public MainActivity(){
-        this.location = null;
-        this.WaypointList = null;
-        this.started = false;
-        this.mapInitialized = false;
+
 
     }
     @Override
@@ -77,8 +70,7 @@ public class MainActivity extends FragmentActivity {
                 //MIGHT NEED TO HANDLE THIS DIFFERENT SINCE THIS IS A FOR LOOP
                 BluetoothDevice mDevice = device;
                 Log.d("CREATEDACONNECTTHREAD","CREATEDACONNECTTHREAD");
-                mConnectThread = new ConnectThread(mDevice);
-                mConnectThread.run();
+               App.app.createConnectThread(mDevice);
                 break;
                 //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }

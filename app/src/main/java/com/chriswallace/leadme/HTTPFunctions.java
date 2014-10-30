@@ -34,7 +34,7 @@ public class HTTPFunctions {
 
     public void directionSearch(String Destination) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
         final MainActivity activity = (MainActivity)context;
-        LatLng latlong = activity.location;
+        LatLng latlong = App.app.location;
         String URL;
         Destination = Destination.replaceAll(" ", "+"); // for proper url functionality
         //URL = "https://maps.googleapis.com/maps/api/directions/json?origin=1000+Olin+Way+Needham+MA&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
@@ -51,8 +51,8 @@ public class HTTPFunctions {
                         Fragment frag = activity.getFragmentManager().findFragmentByTag("Map");
                         InitialFragment Mapfrag = (InitialFragment)frag;
                         ArrayList<LatLng> waypoints= MapFunctions.drawRoute(Mapfrag.map, results);
-                        activity.WaypointList = waypoints;
-                        activity.mapInitialized = true;
+                        App.app.WaypointList = waypoints;
+                        App.app.mapInitialized = true;
 
                     }
                 },
