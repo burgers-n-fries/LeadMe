@@ -67,15 +67,15 @@ public class InitialFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d("BEGIN", "STARTING DIRECTIONS");
-                MapFunctions.zoomMap(map,activity.location, 16.0f);
-                MapFunctions.clearMapRedraw(map, activity.location ,activity.WaypointList);
+                MapFunctions.zoomMap(map,App.app.location, 16.0f);
+                MapFunctions.clearMapRedraw(map, App.app.location ,App.app.WaypointList);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
 
             }
         });
 
         write.setOnClickListener(new View.OnClickListener() {
-            MainActivity activity = (MainActivity)getActivity();
+            //MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
                 byte one = 1;
@@ -85,7 +85,7 @@ public class InitialFragment extends Fragment {
 
 
 
-                activity.mConnectThread.mConnectedThread.write(b);
+                App.app.mConnectThread.mConnectedThread.write(b);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
             }
@@ -120,34 +120,34 @@ public class InitialFragment extends Fragment {
 
 
             MainActivity activity = (MainActivity)getActivity();
-            if (activity.started == true) {
+            if (App.app.started == true) {
                 MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
             }
-            if (activity.mapInitialized == false){
+            if (App.app.mapInitialized == false){
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-                activity.mapInitialized = true;
+                App.app.mapInitialized = true;
             }
-            activity.location = new LatLng(location.getLatitude(), location.getLongitude());
-            if (activity.WaypointList != null) {
+            App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
+            if (App.app.WaypointList != null) {
 
                 //REMOVE WAYPOINT IF YOU REACHED IT
-                Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
+                Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
                 if (checkDistance < 20) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
-                    activity.WaypointList.remove(0);
+                    App.app.WaypointList.remove(0);
                 }
 
 
-                MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
+                MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
 
-                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location,checkDistance);
+                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList,App.app.location,checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
 
                 //WRITE ANGLE TO BLUETOOTH
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL",b.toString());
-                if (activity.mConnectThread != null &&  activity.mConnectThread.mConnectedThread != null) {
-                    activity.mConnectThread.mConnectedThread.write(b);
+                if (App.app.mConnectThread != null &&  App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
                 }
                 else {
                     Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
@@ -178,33 +178,33 @@ public class InitialFragment extends Fragment {
 
 
             MainActivity activity = (MainActivity)getActivity();
-            if (activity.started == true) {
+            if (App.app.started == true) {
                 MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
             }
-            if (activity.mapInitialized == false){
+            if (App.app.mapInitialized == false){
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-                activity.mapInitialized = true;
+                App.app.mapInitialized = true;
             }
-            activity.location = new LatLng(location.getLatitude(), location.getLongitude());
-            if (activity.WaypointList != null) {
+            App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
+            if (App.app.WaypointList != null) {
 
-                Double checkDistance = MapFunctions.calculateDistance(activity.location,activity.WaypointList.get(0));
+                Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
                 if (checkDistance < 20) {
-                    activity.WaypointList.remove(0);
+                    App.app.WaypointList.remove(0);
                 }
 
                 //clear map and redraw with current location and waypoints.
-                MapFunctions.clearMapRedraw(map, activity.location, activity.WaypointList);
+                MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
                 // Determine angle to vibrate
-                Double NorthAngle = MapFunctions.determineAngle(activity.WaypointList,activity.location, checkDistance);
+                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList,App.app.location, checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
 
                 //WRITE THE ANGEL TO THE BLUETOOTH
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL",b.toString());
-                if (activity.mConnectThread != null &&  activity.mConnectThread.mConnectedThread != null) {
-                    activity.mConnectThread.mConnectedThread.write(b);
+                if (App.app.mConnectThread != null &&  App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
                 }
                 else {
                     Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
