@@ -23,7 +23,7 @@ public class MapFunctions {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
     }
 
-    public static ArrayList<LatLng> drawRoute(GoogleMap map, List<List<HashMap<String,String>>> points){
+    public static ArrayList<LatLng> drawRoute(GoogleMap map, List<List<HashMap<String,String>>> points,Boolean recalculate){
         //DRAWS THE ROUTE ON THE ACTIVE MAP, CALLED WHEN YOU HIT DIRECTIONS
         ArrayList<LatLng> waypoints = new ArrayList<LatLng>();
 
@@ -63,7 +63,10 @@ public class MapFunctions {
             }
             LatLngBounds bounds = new LatLngBounds(new LatLng(minLat,minLong),new LatLng(maxLat,maxLong));
             map.addPolyline(route);
-            reboundMap(map,bounds);
+            if (recalculate == false){
+                reboundMap(map,bounds);
+            }
+
 
 
         }

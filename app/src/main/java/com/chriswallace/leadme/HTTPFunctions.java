@@ -32,7 +32,7 @@ public class HTTPFunctions {
         this.queue = Volley.newRequestQueue(context);
     }//ALWAYS PASS IN getActivity
 
-    public void directionSearch(String Destination) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
+    public void directionSearch(String Destination,final Boolean recalculate) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
         final MainActivity activity = (MainActivity)context;
         LatLng latlong = App.app.location;
         String URL;
@@ -50,7 +50,7 @@ public class HTTPFunctions {
                         Log.d("REULTS",results.toString());
                         Fragment frag = activity.getFragmentManager().findFragmentByTag("Map");
                         InitialFragment Mapfrag = (InitialFragment)frag;
-                        ArrayList<LatLng> waypoints= MapFunctions.drawRoute(Mapfrag.map, results);
+                        ArrayList<LatLng> waypoints= MapFunctions.drawRoute(Mapfrag.map, results,recalculate);
                         App.app.WaypointList = waypoints;
                         App.app.mapInitialized = true;
 

@@ -98,8 +98,9 @@ public class InitialFragment extends Fragment {
                 EditText addressText = (EditText) rootView.findViewById(R.id.DestinationText);
                 String address = addressText.getText().toString();
                 //SHOULD I CLEAR TEXT??
+                App.app.destination = address;
                 HTTPFunctions http = new HTTPFunctions(getActivity());
-                http.directionSearch(address);
+                http.directionSearch(address,false);
             }
         });
 
@@ -117,7 +118,15 @@ public class InitialFragment extends Fragment {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("LOCATION",location.toString());
+            if (App.app.previousWaypoint != null){
 
+                double recalcCheck = MapFunctions.recalculateCheck(App.app.location,App.app.previousWaypoint,App.app.WaypointList.get(0));
+                if (recalcCheck > 50){
+                    HTTPFunctions http = new HTTPFunctions(getActivity());
+                    http.directionSearch(App.app.destination,true);
+
+                }
+            }
 
             //GET DISTANCE FROM LINE, THEN RECALCULATE;
             if (App.app.started == true) {

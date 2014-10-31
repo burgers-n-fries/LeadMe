@@ -23,6 +23,7 @@ public class App extends Application {
     ConnectThread mConnectThread;
     Boolean onRoute;
     LatLng previousWaypoint;
+    String destination;
 
     @Override
     public void onCreate() {
@@ -32,6 +33,7 @@ public class App extends Application {
         this.started = false;
         this.mapInitialized = false;
         this.onRoute = false;
+        this.destination = null;
         previousWaypoint = null;
         app = this;
     }
