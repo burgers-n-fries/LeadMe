@@ -1,16 +1,25 @@
 package com.chriswallace.leadme;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 
@@ -33,13 +42,58 @@ import java.util.List;
  */
 public class InitialFragment extends Fragment {
     GoogleMap map;
+
+    String searchedText;
     public InitialFragment() {
         this.map = null;
+        this.searchedText = "";
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu , MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        super.onCreateOptionsMenu(menu, inflater);
+
+
+
+        inflater.inflate(R.menu.main, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextChange(String newText) {
+                // this is your adapter that will be filtered
+                return true;
+            }
+
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(searchedText,query);
+                if (query.equals(searchedText)){
+                    Log.d("TEST","THIS IS THE TEST");
+                    MapFunctions.zoomMap(map,App.app.location, 16.0f);
+                    MapFunctions.clearMapRedraw(map, App.app.location ,App.app.WaypointList);
+                    return true;
+
+                }
+                else {
+                    //SHOULD I CLEAR TEXT??
+                    App.app.destination = query;
+                    HTTPFunctions http = new HTTPFunctions(getActivity());
+                    http.directionSearch(query, false);
+                    searchedText = query;
+                    return true;
+                }
+            }
+        };
+        searchView.setOnQueryTextListener(queryTextListener);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final Button searchDirections = (Button) rootView.findViewById(R.id.directions);
         final Button start = (Button) rootView.findViewById(R.id.Start);
@@ -51,13 +105,40 @@ public class InitialFragment extends Fragment {
         this.map =frag.getMap();
         Log.d("MAP",map.toString());
         LocationManager mLocationManager = (LocationManager)getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+        Boolean enabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!enabled){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    getActivity());
+            alertDialogBuilder
+                    .setMessage("GPS is disabled in your device. Enable it?")
+                    .setCancelable(false)
+                    .setPositiveButton("Enable GPS",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    Intent callGPSSettingIntent = new Intent(
+                                            android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    getActivity().startActivity(callGPSSettingIntent);
+                                }
+                            });
+            alertDialogBuilder.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = alertDialogBuilder.create();
+            alert.show();
+        }
+
         Location lastLocal = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastLocal != null) {
             Log.d("LOCATION",lastLocal.toString());
         }
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200, 1, mLocationListener);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,200,1,coarseLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 4, mLocationListener); //ADJUST TO BALANCE PERFORMANCE WITH ABTTERY LIFE
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
            // MapsInitializer.initialize(this.getActivity());
 
 
@@ -173,6 +254,28 @@ public class InitialFragment extends Fragment {
 
         public void onProviderDisabled(String Provider){
             Log.d("YO","PROVIDER DISABLED");
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                    getActivity());
+            alertDialogBuilder
+                    .setMessage("GPS is disabled in your device. Enable it?")
+                    .setCancelable(false)
+                    .setPositiveButton("Enable GPS",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    Intent callGPSSettingIntent = new Intent(
+                                            android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    getActivity().startActivity(callGPSSettingIntent);
+                                }
+                            });
+            alertDialogBuilder.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = alertDialogBuilder.create();
+            alert.show();
         }
         //THIS SHOULD PROMPT THE USER TO TURN BACK ON
         public void onStatusChanged(String LocationServices, int status, Bundle extras){
