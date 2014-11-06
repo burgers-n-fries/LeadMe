@@ -24,6 +24,7 @@ public class App extends Application {
     Boolean onRoute;
     LatLng previousWaypoint;
     String destination;
+    ArrayList<String> destinations; //LOCATION TO DISPALY FOR AUTOCOMPLETE
 
     @Override
     public void onCreate() {

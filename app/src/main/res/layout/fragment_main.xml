@@ -38,6 +38,18 @@
         android:layout_alignParentStart="true"
         android:visibility="invisible"/>
 
+    <ListView
+        android:id="@+id/autocomplete"
+        android:layout_height="140dp"
+        android:layout_width="200dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="60dp"
+        >
+
+    </ListView>
+
+
+
 
 
 

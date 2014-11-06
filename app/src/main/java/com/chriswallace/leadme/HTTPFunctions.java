@@ -12,6 +12,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -31,6 +33,43 @@ public class HTTPFunctions {
         this.context = context;
         this.queue = Volley.newRequestQueue(context);
     }//ALWAYS PASS IN getActivity
+
+    public void autocompleteSearch(String text){
+        final MainActivity activity = (MainActivity)context;
+        String URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
+        text = text.replaceAll(" ", "+");
+        URL = "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY&input=" + text;
+
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            int i;
+                            Log.d("YOLO",App.app.destinations.toString());
+                            App.app.destinations.clear();
+                            for (i = 0; i < 5; i++) {
+                                JSONArray predictions = response.getJSONArray("predictions");
+                                JSONObject description = predictions.getJSONObject(0);
+                                App.app.destinations.add(description.getString("description"));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    }
+                }
+        );
+
+        queue.add(getRequest);
+    }
 
     public void directionSearch(String Destination,final Boolean recalculate) { //WONT ALWAYS BE VOID, RETURN INFO FROM DATA
         final MainActivity activity = (MainActivity)context;

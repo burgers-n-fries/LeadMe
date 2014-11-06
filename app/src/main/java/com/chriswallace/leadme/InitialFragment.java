@@ -1,5 +1,6 @@
 package com.chriswallace.leadme;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -18,8 +19,11 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -35,7 +39,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONObject;
+
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,10 +53,14 @@ public class InitialFragment extends Fragment {
     GoogleMap map;
     Button start;
     Button cancel;
+    ListView results;
+    ArrayList<String> destinations;
 
     String searchedText;
     public InitialFragment() {
         this.map = null;
+        App.app.destinations = new ArrayList<String>();
+        App.app.destinations.add("");
 
     }
 
@@ -67,8 +78,19 @@ public class InitialFragment extends Fragment {
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
             public boolean onQueryTextChange(String newText) {
                 // this is your adapter that will be filtered
+
+                HTTPFunctions http = new HTTPFunctions(getActivity());
+                if (newText != null) {
+
+                    http.autocompleteSearch(newText);
+
+                    results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                            App.app.destinations));
+                }
                 return true;
             }
+
+
 
             public boolean onQueryTextSubmit(String query) {
 
@@ -89,18 +111,24 @@ public class InitialFragment extends Fragment {
         };
         searchView.setOnQueryTextListener(queryTextListener);
 
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
+
+
+
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+
+
         start = (Button) rootView.findViewById(R.id.Start);
         cancel = (Button) rootView.findViewById(R.id.Cancel);
-
+        results = (ListView) rootView.findViewById(R.id.autocomplete);
+        setHasOptionsMenu(true);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
@@ -160,13 +188,14 @@ public class InitialFragment extends Fragment {
         });
 
         cancel.setOnClickListener(new View.OnClickListener() {
-            MainActivity activity = (MainActivity)getActivity();
+            MainActivity activity = (MainActivity) getActivity();
+
             @Override
             public void onClick(View v) {
                 App.app.WaypointList = null;
 
-                MapFunctions.zoomMap(map,App.app.location, 12.0f);
-                MapFunctions.clearMapRedraw(map, App.app.location ,null);
+                MapFunctions.zoomMap(map, App.app.location, 12.0f);
+                MapFunctions.clearMapRedraw(map, App.app.location, null);
                 cancel.setVisibility(View.INVISIBLE);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
@@ -332,4 +361,6 @@ public class InitialFragment extends Fragment {
             //CREATE A MESSAGE TELLING SUER TO TURN GPS BACK ON
         }
     };
+
+
 }
