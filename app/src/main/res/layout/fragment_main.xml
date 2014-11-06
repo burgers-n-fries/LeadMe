@@ -15,36 +15,30 @@
 
          />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Directions"
-        android:id="@+id/directions"
-        android:layout_below="@+id/map"
-        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start"
         android:id="@+id/Start"
-        android:layout_below="@+id/directions"
-        android:layout_alignParentEnd="true" />
+        android:layout_margin="20dp"
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/DestinationText"
-        android:layout_above="@+id/Start"
-        android:layout_toStartOf="@+id/directions" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="invisible"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test"
-        android:id="@+id/write"
-        android:layout_below="@+id/directions"
-        android:layout_toStartOf="@+id/directions" />
+        android:text="X"
+        android:id="@+id/Cancel"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:visibility="invisible"/>
+
+
 
 
 </RelativeLayout>
