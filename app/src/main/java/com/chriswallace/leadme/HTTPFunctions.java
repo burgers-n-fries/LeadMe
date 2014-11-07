@@ -51,7 +51,7 @@ public class HTTPFunctions {
                             App.app.destinations.clear();
                             for (i = 0; i < 5; i++) {
                                 JSONArray predictions = response.getJSONArray("predictions");
-                                JSONObject description = predictions.getJSONObject(0);
+                                JSONObject description = predictions.getJSONObject(i);
                                 App.app.destinations.add(description.getString("description"));
                             }
 
@@ -77,7 +77,8 @@ public class HTTPFunctions {
         String URL;
         Destination = Destination.replaceAll(" ", "+"); // for proper url functionality
         //URL = "https://maps.googleapis.com/maps/api/directions/json?origin=1000+Olin+Way+Needham+MA&destination=4+Providence+Rd+Sutton+MA&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
-        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latlong.latitude + "," + latlong.longitude + "&destination=" + Destination + "&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY";
+        URL = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latlong.latitude + "," + latlong.longitude + "&destination=" + Destination + "&key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY"
+                +"&location" + String.valueOf(App.app.location.latitude) + "," + String.valueOf(App.app.location.longitude);
 
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
                 new Response.Listener<JSONObject>() {

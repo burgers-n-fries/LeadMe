@@ -83,7 +83,7 @@ public class InitialFragment extends Fragment {
                 if (newText != null) {
 
                     http.autocompleteSearch(newText);
-
+                    results.setVisibility(View.VISIBLE);
                     results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
                             App.app.destinations));
                 }
