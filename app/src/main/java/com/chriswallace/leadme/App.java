@@ -35,7 +35,8 @@ public class App extends Application {
         this.mapInitialized = false;
         this.onRoute = false;
         this.destination = null;
-        previousWaypoint = null;
+        this.previousWaypoint = null;
+        this.destinations = new ArrayList<String>();
         app = this;
     }
 

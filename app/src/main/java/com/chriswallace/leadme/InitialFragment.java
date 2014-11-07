@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,13 +55,15 @@ public class InitialFragment extends Fragment {
     Button start;
     Button cancel;
     ListView results;
-    ArrayList<String> destinations;
+    Boolean open;
+    SearchView searchView;
+
 
     String searchedText;
     public InitialFragment() {
         this.map = null;
-        App.app.destinations = new ArrayList<String>();
-        App.app.destinations.add("");
+        this.open = false;
+
 
     }
 
@@ -68,12 +71,21 @@ public class InitialFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu , MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu, inflater);
+        results.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                String selectedFromList = (results.getItemAtPosition(position)).toString();
+                searchView.setQuery(selectedFromList,true);
+                results.setVisibility(View.INVISIBLE);
+                App.app.destinations.clear();
 
+            }
+        });
 
 
         inflater.inflate(R.menu.main, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
 
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
             public boolean onQueryTextChange(String newText) {
@@ -81,11 +93,15 @@ public class InitialFragment extends Fragment {
 
                 HTTPFunctions http = new HTTPFunctions(getActivity());
                 if (newText != null) {
+                    if (open) {
+                        Log.d("TEST", newText);
+                        http.autocompleteSearch(newText);
+                        results.setVisibility(View.VISIBLE);
+                        results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                                App.app.destinations));
 
-                    http.autocompleteSearch(newText);
-                    results.setVisibility(View.VISIBLE);
-                    results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
-                            App.app.destinations));
+                    }
+                    open = true;
                 }
                 return true;
             }
@@ -101,7 +117,16 @@ public class InitialFragment extends Fragment {
                     searchedText = query;
                     start.setVisibility(View.VISIBLE);
                     cancel.setVisibility(View.VISIBLE);
-
+                    App.app.destinations.clear();
+                    results.setVisibility(View.INVISIBLE);
+                     if (query.equals("test")) {
+                         String writeString = "test!"; //TEST FUNCTIONALITY
+                         byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                         Log.d("NULL", b.toString());
+                         if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                             App.app.mConnectThread.mConnectedThread.write(b);
+                         }
+                     }
                     InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
@@ -197,6 +222,7 @@ public class InitialFragment extends Fragment {
                 MapFunctions.zoomMap(map, App.app.location, 12.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location, null);
                 cancel.setVisibility(View.INVISIBLE);
+                searchView.setQuery("",false);
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
             }

@@ -49,7 +49,7 @@ public class HTTPFunctions {
                             int i;
                             Log.d("YOLO",App.app.destinations.toString());
                             App.app.destinations.clear();
-                            for (i = 0; i < 5; i++) {
+                            for (i = 0; i < 3; i++) {
                                 JSONArray predictions = response.getJSONArray("predictions");
                                 JSONObject description = predictions.getJSONObject(i);
                                 App.app.destinations.add(description.getString("description"));

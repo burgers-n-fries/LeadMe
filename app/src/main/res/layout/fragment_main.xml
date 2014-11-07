@@ -40,11 +40,11 @@
 
     <ListView
         android:id="@+id/autocomplete"
-        android:layout_height="140dp"
-        android:layout_width="200dp"
-        android:background="@android:color/white"
+        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:background="#BB000000"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="48dp"
         android:visibility="invisible"
         >
 
