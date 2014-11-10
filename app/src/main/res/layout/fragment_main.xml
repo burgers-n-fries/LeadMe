@@ -33,8 +33,8 @@
         android:text="X"
         android:id="@+id/Cancel"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
-        android:layout_alignParentTop="true"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/directionDisplay"
         android:layout_alignParentStart="true"
         android:visibility="invisible"/>
 
@@ -49,6 +49,17 @@
         >
 
     </ListView>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/directionDisplay"
+        android:layout_alignParentTop="true"
+        android:text=""
+        android:textSize="25dp"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:visibility="invisible"/>
 
 
 

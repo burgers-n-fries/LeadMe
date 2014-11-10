@@ -3,6 +3,9 @@ package com.chriswallace.leadme;
 /**
  * Created by cwallace on 10/21/14.
  */
+import android.util.Log;
+import android.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +51,24 @@ public class DirectionsJSONParser {
                             hm.put("lat", Double.toString(((LatLng)list.get(l)).latitude) );
                             hm.put("lng", Double.toString(((LatLng)list.get(l)).longitude) );
                             path.add(hm);
+                            if (l == 0){
+                                String instructions = ((JSONObject)jSteps.get(k)).getString("html_instructions");
+
+                                App.app.directionList.add(new Pair<LatLng, String>(list.get(l), instructions));
+
+                                //App.app.directionList.put(list.get(l),instructions);
+                                //addDirectionList(JSONArray jRoutes)
+                            }
+
                         }
                     }
                     routes.add(path);
                 }
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.d("WE BROKE", "HERE WE DID");
         }catch (Exception e){
         }
         return routes;
@@ -96,5 +110,21 @@ public class DirectionsJSONParser {
         }
 
         return poly;
+    }
+    public void addDirectionList(JSONArray routes){
+        //CURRENTLY DOES NOT SUPPORT MULTIWAYPOINT ACCESS
+        try {
+           JSONObject route = (JSONObject)routes.get(0);
+            JSONArray steps = (JSONArray)((JSONObject)((JSONArray)route.get("legs")).get(0)).get("steps");
+            int k;
+            for (k = 0;k <steps.length();k++){
+                String instructions = ((JSONObject)steps.get(k)).getString("html_instructions");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch (Exception e){
+        }
+
     }
 }

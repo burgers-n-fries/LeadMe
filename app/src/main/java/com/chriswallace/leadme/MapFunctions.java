@@ -27,6 +27,7 @@ public class MapFunctions {
         //DRAWS THE ROUTE ON THE ACTIVE MAP, CALLED WHEN YOU HIT DIRECTIONS
         ArrayList<LatLng> waypoints = new ArrayList<LatLng>();
 
+
         PolylineOptions route = new PolylineOptions();
 
 

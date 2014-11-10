@@ -12,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,6 +58,7 @@ public class InitialFragment extends Fragment {
     ListView results;
     Boolean open;
     SearchView searchView;
+    TextView directionView;
 
 
     String searchedText;
@@ -153,6 +155,7 @@ public class InitialFragment extends Fragment {
         start = (Button) rootView.findViewById(R.id.Start);
         cancel = (Button) rootView.findViewById(R.id.Cancel);
         results = (ListView) rootView.findViewById(R.id.autocomplete);
+        directionView = (TextView) rootView.findViewById(R.id.directionDisplay);
         setHasOptionsMenu(true);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
@@ -203,10 +206,15 @@ public class InitialFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
+                //cancel.s
                 Log.d("BEGIN", "STARTING DIRECTIONS");
                 MapFunctions.zoomMap(map,App.app.location, 16.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location ,App.app.WaypointList);
                 start.setVisibility(View.INVISIBLE);
+                directionView.setVisibility(View.VISIBLE);
+                directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
+                //directionView.setText("THIS IS A TEST OF EVERYTHING");
+                activity.getActionBar().hide();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
 
             }
@@ -222,7 +230,9 @@ public class InitialFragment extends Fragment {
                 MapFunctions.zoomMap(map, App.app.location, 12.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location, null);
                 cancel.setVisibility(View.INVISIBLE);
+                directionView.setVisibility(View.INVISIBLE);
                 searchView.setQuery("",false);
+                activity.getActionBar().show();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
             }
@@ -254,6 +264,7 @@ public class InitialFragment extends Fragment {
                     HTTPFunctions http = new HTTPFunctions(getActivity());
                     http.directionSearch(App.app.destination,true);
 
+
                 }
             }
 
@@ -270,6 +281,11 @@ public class InitialFragment extends Fragment {
 
                 //REMOVE WAYPOINT IF YOU REACHED IT
                 Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
+                Double newInstruction = MapFunctions.calculateDistance(App.app.location,App.app.directionList.get(0).first);
+                if (newInstruction < 20){
+                    App.app.directionList.remove(0);
+                    directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
+                }
                 if (checkDistance < 20) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
                     App.app.previousWaypoint = App.app.WaypointList.get(0);
                     App.app.WaypointList.remove(0);

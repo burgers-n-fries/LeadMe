@@ -87,6 +87,7 @@ public class HTTPFunctions {
                         Log.d("TEst", response.toString());// display response
                         DirectionsJSONParser parser = new DirectionsJSONParser();
                         List<List<HashMap<String,String>>> results = parser.parse(response);
+
                         Log.d("REULTS",results.toString());
                         Fragment frag = activity.getFragmentManager().findFragmentByTag("Map");
                         InitialFragment Mapfrag = (InitialFragment)frag;
@@ -101,6 +102,7 @@ public class HTTPFunctions {
                     public void onErrorResponse(VolleyError error) {
                     }
                 }
+
         );
 
         queue.add(getRequest);
