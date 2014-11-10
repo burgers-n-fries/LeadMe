@@ -197,7 +197,7 @@ public class InitialFragment extends Fragment {
         }
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 4, mLocationListener); //ADJUST TO BALANCE PERFORMANCE WITH ABTTERY LIFE
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
+       // mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
            // MapsInitializer.initialize(this.getActivity());
 
 
@@ -232,6 +232,7 @@ public class InitialFragment extends Fragment {
                 cancel.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.INVISIBLE);
                 searchView.setQuery("",false);
+                App.app.directionList.clear();
                 activity.getActionBar().show();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
