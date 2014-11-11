@@ -2,6 +2,7 @@ package com.chriswallace.leadme;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +13,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+
+import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -197,7 +200,7 @@ public class InitialFragment extends Fragment {
         }
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 4, mLocationListener); //ADJUST TO BALANCE PERFORMANCE WITH ABTTERY LIFE
-       // mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
            // MapsInitializer.initialize(this.getActivity());
 
 
@@ -231,8 +234,11 @@ public class InitialFragment extends Fragment {
                 MapFunctions.clearMapRedraw(map, App.app.location, null);
                 cancel.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.INVISIBLE);
-                searchView.setQuery("",false);
+                searchView.setQuery("", false);
                 App.app.directionList.clear();
+                results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                        App.app.destinations));
+                results.setVisibility(View.INVISIBLE);
                 activity.getActionBar().show();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
