@@ -26,6 +26,7 @@ public class App extends Application {
     Boolean onRoute;
     LatLng previousWaypoint;
     String destination;
+    LatLng previousLocation;
     ArrayList<String> destinations; //LOCATION TO DISPALY FOR AUTOCOMPLETE
 
     ArrayList<Pair<LatLng,String>> directionList;

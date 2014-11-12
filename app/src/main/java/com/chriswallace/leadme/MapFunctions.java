@@ -150,7 +150,7 @@ public class MapFunctions {
 
     }
 
-    public static double determineAngle(ArrayList<LatLng> waypoints, LatLng location, double distance){
+    public static double determineAngle(LatLng waypoints, LatLng location, double distance){
 
         //double distance = calculateDistance(location,waypoints.get(0));
 
@@ -160,23 +160,25 @@ public class MapFunctions {
             double weight1 = (100 - distance)/100;
 
             //Code to change angle here... but for now
-            double LatDif0 = location.latitude - waypoints.get(0).latitude;
-            double LongDif0 = location.longitude - waypoints.get(0).longitude;
+            double LatDif0 = location.latitude - waypoints.latitude;
+            double LongDif0 = location.longitude - waypoints.longitude;
             Double angle0 = (Math.toDegrees(Math.atan2(LongDif0, LatDif0))+90) % 360;
 
-            double LatDif1 = location.latitude - waypoints.get(1).latitude;
-            double LongDif1 = location.longitude - waypoints.get(1).longitude;
+            double LatDif1 = location.latitude - waypoints.latitude;
+            double LongDif1 = location.longitude - waypoints.longitude;
             Double angle1 = (Math.toDegrees(Math.atan2(LongDif1, LatDif1))+90) % 360;
 
             return angle0*weight0+weight1*angle1;
 
         }
         else{
-            double LatDif = location.latitude - waypoints.get(0).latitude;
-            double LongDif = location.longitude - waypoints.get(0).longitude;
+            double LatDif = location.latitude - waypoints.latitude;
+            double LongDif = location.longitude - waypoints.longitude;
             //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
             Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
             //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOULD VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
+            Log.d("WEIRD STUFF",angle.toString());
+            angle = (angle +360)%360;
             Double NorthAngle = (angle - 90 ) % 360;
             return NorthAngle;
         }

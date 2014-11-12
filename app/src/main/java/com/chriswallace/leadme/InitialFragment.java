@@ -246,10 +246,13 @@ public class InitialFragment extends Fragment {
                 Log.d("BEGIN", "STARTING DIRECTIONS");
                 MapFunctions.zoomMap(map,App.app.location, 16.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location ,App.app.WaypointList);
+                if (App.app.previousLocation != null){
+                    Double NorthAngle = (360 - MapFunctions.determineAngle(App.app.location,App.app.previousLocation,100));
+                    CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,NorthAngle.floatValue());
+                    map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+                }
 
-                Double NorthAngle = (360 - MapFunctions.determineAngle(App.app.WaypointList,App.app.location,100));
-                CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,NorthAngle.floatValue());
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+
 
                 start.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.VISIBLE);
@@ -303,6 +306,7 @@ public class InitialFragment extends Fragment {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("LOCATION",location.toString());
+            App.app.previousLocation = App.app.location;
             if (App.app.previousWaypoint != null){
 
                 double recalcCheck = MapFunctions.recalculateCheck(App.app.location,App.app.previousWaypoint,App.app.WaypointList.get(0));
@@ -340,13 +344,18 @@ public class InitialFragment extends Fragment {
 
                 MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
 
-                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList,App.app.location,checkDistance);
+                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList.get(0),App.app.location,checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
-                CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,360 - NorthAngle.floatValue());
+                if (App.app.previousLocation != null) {
+                    Double heading = MapFunctions.determineAngle(App.app.location,App.app.previousLocation,200);
+                    CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,360 - heading.floatValue());
 
 
 
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+                    map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+
+                }
+
 
                 //WRITE ANGLE TO BLUETOOTH
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
@@ -403,42 +412,15 @@ public class InitialFragment extends Fragment {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("COARSELOCATION",location.toString());
-
-
-            MainActivity activity = (MainActivity)getActivity();
-            if (App.app.started == true) {
-                MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
-            }
-            if (App.app.mapInitialized == false){
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-                App.app.mapInitialized = true;
-            }
-            App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
-            if (App.app.WaypointList != null) {
-
-                Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
-                if (checkDistance < 20) {
-                    App.app.WaypointList.remove(0);
+            
+            if (App.app.location == null) {
+                if (App.app.mapInitialized == false) {
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                    App.app.mapInitialized = true;
                 }
-
-                //clear map and redraw with current location and waypoints.
-                MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
-                // Determine angle to vibrate
-                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList,App.app.location, checkDistance);
-                Log.d("ANGLE", NorthAngle.toString());
-
-                //WRITE THE ANGEL TO THE BLUETOOTH
-                String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
-                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
-                Log.d("NULL",b.toString());
-                if (App.app.mConnectThread != null &&  App.app.mConnectThread.mConnectedThread != null) {
-                    App.app.mConnectThread.mConnectedThread.write(b);
-                }
-                else {
-                    Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
-                }
-
+                App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
             }
+
         }
 
         public void onProviderEnabled(String Provider){
