@@ -40,6 +40,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -81,6 +82,7 @@ public class InitialFragment extends Fragment {
                                     int position, long id) {
                 String selectedFromList = (results.getItemAtPosition(position)).toString();
                 searchView.setQuery(selectedFromList,true);
+                searchView.clearFocus();
                 results.setVisibility(View.INVISIBLE);
                 App.app.destinations.clear();
 
@@ -91,6 +93,10 @@ public class InitialFragment extends Fragment {
         inflater.inflate(R.menu.main, menu);
 
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+
+
+
 
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
             public boolean onQueryTextChange(String newText) {
@@ -120,6 +126,7 @@ public class InitialFragment extends Fragment {
                     HTTPFunctions http = new HTTPFunctions(getActivity());
                     http.directionSearch(query, false);
                     searchedText = query;
+
                     start.setVisibility(View.VISIBLE);
                     cancel.setVisibility(View.VISIBLE);
                     App.app.destinations.clear();
@@ -140,6 +147,9 @@ public class InitialFragment extends Fragment {
 
         };
         searchView.setOnQueryTextListener(queryTextListener);
+        searchView.clearFocus();
+
+
 
 
     }
@@ -151,7 +161,11 @@ public class InitialFragment extends Fragment {
 
 
 
+
+
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+
 
 
 
@@ -164,8 +178,27 @@ public class InitialFragment extends Fragment {
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
         MapFragment frag = (MapFragment)getActivity().getFragmentManager().findFragmentById(R.id.map);
+        //MapView frag = (MapView)rootView.findViewById(R.id.map);
+        frag.onCreate(savedInstanceState);
+
+
         this.map =frag.getMap();
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.d("MAPPP","IT WAS CLICKED MF");
+                searchView.clearFocus();
+                InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                results.setVisibility(View.INVISIBLE);
+            }
+        });
         Log.d("MAP",map.toString());
+
+
+
+
         LocationManager mLocationManager = (LocationManager)getActivity().getSystemService(getActivity().LOCATION_SERVICE);
         Boolean enabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -213,6 +246,11 @@ public class InitialFragment extends Fragment {
                 Log.d("BEGIN", "STARTING DIRECTIONS");
                 MapFunctions.zoomMap(map,App.app.location, 16.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location ,App.app.WaypointList);
+
+                Double NorthAngle = (360 - MapFunctions.determineAngle(App.app.WaypointList,App.app.location,100));
+                CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,NorthAngle.floatValue());
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+
                 start.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.VISIBLE);
                 directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
@@ -229,8 +267,9 @@ public class InitialFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 App.app.WaypointList = null;
-
-                MapFunctions.zoomMap(map, App.app.location, 12.0f);
+                CameraPosition camPos = new CameraPosition(App.app.location,12.0f,0,0);
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+                //MapFunctions.zoomMap(map, App.app.location, 12.0f);
                 MapFunctions.clearMapRedraw(map, App.app.location, null);
                 cancel.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.INVISIBLE);
@@ -303,6 +342,11 @@ public class InitialFragment extends Fragment {
 
                 Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList,App.app.location,checkDistance);
                 Log.d("ANGLE", NorthAngle.toString());
+                CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,360 - NorthAngle.floatValue());
+
+
+
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
 
                 //WRITE ANGLE TO BLUETOOTH
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
@@ -410,6 +454,7 @@ public class InitialFragment extends Fragment {
             //CREATE A MESSAGE TELLING SUER TO TURN GPS BACK ON
         }
     };
+
 
 
 }

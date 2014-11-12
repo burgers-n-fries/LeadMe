@@ -177,7 +177,7 @@ public class MapFunctions {
             //double hypotenuse = Math.pow(Math.pow(LatDif,2) + Math.pow(LongDif,2),.5);
             Double angle = Math.toDegrees(Math.atan2(LongDif, LatDif));
             //REPALCE THOSE WITH FUNCTION TO DETERMINE ANGLE IT SHOULD VIBRATE< THAT INCLUDES MEASURED FOR WHEN YOU NEXT HAVE TO TURN
-            Double NorthAngle = (angle + 90 ) % 360;
+            Double NorthAngle = (angle - 90 ) % 360;
             return NorthAngle;
         }
     }
