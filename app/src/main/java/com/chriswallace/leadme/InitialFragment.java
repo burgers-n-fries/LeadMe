@@ -412,7 +412,7 @@ public class InitialFragment extends Fragment {
         @Override
         public void onLocationChanged(final Location location) {
             Log.d("COARSELOCATION",location.toString());
-            
+
             if (App.app.location == null) {
                 if (App.app.mapInitialized == false) {
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
