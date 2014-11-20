@@ -60,9 +60,12 @@ public class InitialFragment extends Fragment {
     Button start;
     Button cancel;
     ListView results;
+    View StatusBar;
     Boolean open;
     SearchView searchView;
     TextView directionView;
+    TextView remaining;
+    View mapV;
 
 
     String searchedText;
@@ -104,14 +107,15 @@ public class InitialFragment extends Fragment {
 
                 HTTPFunctions http = new HTTPFunctions(getActivity());
                 if (newText != null) {
-                    if (open) {
+                    //if (open) {
                         Log.d("TEST", newText);
                         http.autocompleteSearch(newText);
                         results.setVisibility(View.VISIBLE);
                         results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
                                 App.app.destinations));
 
-                    }
+                    //}
+                    //TODO Add a new thread to update that list
                     open = true;
                 }
                 return true;
@@ -123,13 +127,18 @@ public class InitialFragment extends Fragment {
 
                     //SHOULD I CLEAR TEXT??
                     App.app.destination = query;
+                    if (App.app.WaypointList != null){
+                        App.app.WaypointList.clear();
+                    }
+
                     HTTPFunctions http = new HTTPFunctions(getActivity());
                     http.directionSearch(query, false);
                     searchedText = query;
-
+                    //TODO DONT DISPLAY START UNTIL RESULTS LOAD
                     start.setVisibility(View.VISIBLE);
                     cancel.setVisibility(View.VISIBLE);
                     App.app.destinations.clear();
+
                     results.setVisibility(View.INVISIBLE);
                      if (query.equals("test")) {
                          String writeString = "test!"; //TEST FUNCTIONALITY
@@ -167,22 +176,26 @@ public class InitialFragment extends Fragment {
 
 
 
-
-
+        remaining = (TextView) rootView.findViewById(R.id.remainingTime);
+        StatusBar = rootView.findViewById(R.id.statusbar);
         start = (Button) rootView.findViewById(R.id.Start);
         cancel = (Button) rootView.findViewById(R.id.Cancel);
         results = (ListView) rootView.findViewById(R.id.autocomplete);
         directionView = (TextView) rootView.findViewById(R.id.directionDisplay);
+
         setHasOptionsMenu(true);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
         MapFragment frag = (MapFragment)getActivity().getFragmentManager().findFragmentById(R.id.map);
+
+        mapV = frag.getView();
         //MapView frag = (MapView)rootView.findViewById(R.id.map);
         frag.onCreate(savedInstanceState);
 
 
         this.map =frag.getMap();
+        map.getUiSettings().setZoomControlsEnabled(false);
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -253,10 +266,20 @@ public class InitialFragment extends Fragment {
                 }
 
 
-
+                StatusBar.setVisibility(View.VISIBLE);
                 start.setVisibility(View.INVISIBLE);
                 directionView.setVisibility(View.VISIBLE);
+                ArrayList<LatLng> totalDistPoints = App.app.WaypointList;
+                totalDistPoints.add(0,App.app.location);
+                Double distance = MapFunctions.totalDistance(totalDistPoints);
+                Double time = distance/5280*18;
+                long hour = (long)Math.floor(time/60);
+                long minutes = (long)Math.ceil(time%60);
+                String text = hour + " hr " + minutes + " min";
+                remaining.setText(text);
+
                 directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
+
                 //directionView.setText("THIS IS A TEST OF EVERYTHING");
                 activity.getActionBar().hide();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION, 
@@ -281,6 +304,8 @@ public class InitialFragment extends Fragment {
                 results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
                         App.app.destinations));
                 results.setVisibility(View.INVISIBLE);
+
+                StatusBar.setVisibility(View.INVISIBLE);
                 activity.getActionBar().show();
                 //ORIENT BASED ON COMPASS, ALSO GET LAST LOCATION,
 
@@ -328,6 +353,16 @@ public class InitialFragment extends Fragment {
             }
             App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
             if (App.app.WaypointList != null) {
+                ArrayList<LatLng> totalDistPoints = App.app.WaypointList;
+                totalDistPoints.add(0,App.app.location);
+                Double distance = MapFunctions.totalDistance(totalDistPoints);
+                Double time = distance/5280*18;
+                long hour = (long)Math.floor(time/60);
+                long minutes = (long)Math.ceil(time%60);
+                String text = hour + " hr " + minutes + " min";
+                remaining.setText(text);
+
+                //TODO I THOUGHT I CLEARED TEH MAP WHEN YOU SEARCHED DIRECTIONS...
 
                 //REMOVE WAYPOINT IF YOU REACHED IT
                 Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
@@ -368,6 +403,7 @@ public class InitialFragment extends Fragment {
                     Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
                 }
             }
+
             //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
             //your code here
         }

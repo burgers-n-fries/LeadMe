@@ -196,6 +196,14 @@ public class MapFunctions {
         return calculateDistance(new LatLng(latpoi,longpoi),location);
     }
 
+    public static Double totalDistance(ArrayList<LatLng> waypointList){
+        int i;
+        Double distance = 0.0;
+        for (i = 0;i < waypointList.size()-1;i++){
+            distance = distance + calculateDistance(waypointList.get(i),waypointList.get(i+1));
+        }
+        return distance;
+    }
 
 
 
