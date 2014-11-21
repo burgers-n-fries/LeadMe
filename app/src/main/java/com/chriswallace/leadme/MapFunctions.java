@@ -29,7 +29,7 @@ public class MapFunctions {
 
 
         PolylineOptions route = new PolylineOptions();
-
+        route.color(0xFF0000FF);
 
         int i;
         Log.d("THIS",points.get(0).toString());
@@ -113,7 +113,7 @@ public class MapFunctions {
     }
 
     public static void drawCircle(GoogleMap map, LatLng center){
-        CircleOptions circle = new CircleOptions().center(center).radius(2);
+        CircleOptions circle = new CircleOptions().center(center).radius(8).fillColor(0x110000FF).strokeColor(0xFF0000FF);
         map.addCircle(circle);
     }
 
@@ -124,6 +124,7 @@ public class MapFunctions {
         } else {
             int i;
             PolylineOptions route = new PolylineOptions();
+            route.color(0xFF0000FF);
             for (i = 0; i < waypoints.size(); i++) {
 
                 route.add(waypoints.get(i));
