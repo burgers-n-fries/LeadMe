@@ -275,7 +275,13 @@ public class InitialFragment extends Fragment {
                 Double time = distance/5280*18;
                 long hour = (long)Math.floor(time/60);
                 long minutes = (long)Math.ceil(time%60);
-                String text = hour + " hr " + minutes + " min";
+                String text;
+                if (hour == 0){
+                    text = minutes + " min";
+                }
+                else {
+                    text = hour + " hr " + minutes + " min";
+                }
                 remaining.setText(text);
 
                 directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
