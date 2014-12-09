@@ -207,6 +207,20 @@ public class MapFunctions {
     }
 
 
+    public static ArrayList<LatLng> determineOffsets(LatLng point, Double ANGLE) {
+        ArrayList<LatLng> returnList = new ArrayList<LatLng>();
+        Double lat = Math.asin(Math.sin(point.latitude)*Math.cos(15)+Math.cos(point.latitude)*Math.sin(15)*Math.cos((ANGLE+90)%360));
+        Double lon = ((point.longitude-Math.asin(Math.sin((ANGLE+90)%360)*Math.sin(15)/Math.cos(15))+3.14) % (2*3.14)) - 3.14;
+        LatLng pt1 = new LatLng(lat,lon);
+        returnList.add(pt1);
+
+        Double lat2 = Math.asin(Math.sin(point.latitude)*Math.cos(15)+Math.cos(point.latitude)*Math.sin(15)*Math.cos((ANGLE+360-90)%360));
+        Double lon2 = ((point.longitude-Math.asin(Math.sin((ANGLE+360-90)%360)*Math.sin(15)/Math.cos(15))+3.14) % (2*3.14)) - 3.14;
+        LatLng pt2 = new LatLng(lat2,lon2);
+        returnList.add(pt2);
+
+        return returnList;
+    }
 
 }
 

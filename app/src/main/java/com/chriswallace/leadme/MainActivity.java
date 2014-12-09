@@ -7,6 +7,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,10 +36,12 @@ import java.util.Set;
 import java.util.UUID;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements SensorEventListener {
 
 
-
+    public SensorManager mSensorManager;
+    public Sensor magnetometer;
+    public Sensor accelerometer;
     public MainActivity(){
 
 
@@ -51,7 +57,12 @@ public class MainActivity extends FragmentActivity {
                     .add(R.id.container, new InitialFragment(),"Map")
                     .commit();
         }
-       BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
 // Device does not support Bluetooth
         }
@@ -80,6 +91,30 @@ public class MainActivity extends FragmentActivity {
 
 
 
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {  }
+    Float azimut;
+    float[] mGravity;
+    float[] mGeomagnetic;
+
+
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) //NOT USING ACCELEROMETER, BUT SHIT IS THERE
+            mGravity = event.values;
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            mGeomagnetic = event.values;
+        if (mGravity != null && mGeomagnetic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                azimut = orientation[0]; // orientation contains: azimut, pitch and roll
+                App.app.heading = azimut;
+            }
+        }
 
     }
 

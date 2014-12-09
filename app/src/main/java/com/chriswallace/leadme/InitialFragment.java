@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -176,6 +178,7 @@ public class InitialFragment extends Fragment {
 
 
 
+
         remaining = (TextView) rootView.findViewById(R.id.remainingTime);
         StatusBar = rootView.findViewById(R.id.statusbar);
         start = (Button) rootView.findViewById(R.id.Start);
@@ -336,14 +339,18 @@ public class InitialFragment extends Fragment {
     private final LocationListener mLocationListener = new LocationListener() { //FINE LOCATION LISTERENER,
         @Override
         public void onLocationChanged(final Location location) {
-            Log.d("LOCATION",location.toString());
+            Log.d("LOCATION", location.toString());
+            App.app.pastLocations.add(new LatLng(location.getLatitude(), location.getLongitude()));
+            if (App.app.pastLocations.size() == 5) {
+                App.app.pastLocations.remove(0); //TRACK THE LAST 4 in this
+            }
             App.app.previousLocation = App.app.location;
-            if (App.app.previousWaypoint != null){
+            if (App.app.previousWaypoint != null) {
 
-                double recalcCheck = MapFunctions.recalculateCheck(App.app.location,App.app.previousWaypoint,App.app.WaypointList.get(0));
-                if (recalcCheck > 50){
+                double recalcCheck = MapFunctions.recalculateCheck(App.app.location, App.app.previousWaypoint, App.app.WaypointList.get(0));
+                if (recalcCheck > 50) {
                     HTTPFunctions http = new HTTPFunctions(getActivity());
-                    http.directionSearch(App.app.destination,true);
+                    http.directionSearch(App.app.destination, true);
 
 
                 }
@@ -353,66 +360,83 @@ public class InitialFragment extends Fragment {
             if (App.app.started == true) {
                 MapFunctions.zoomMap(map, new LatLng(location.getLatitude(), location.getLongitude()), 16.0f);
             }
-            if (App.app.mapInitialized == false){
+            if (App.app.mapInitialized == false) {
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
                 App.app.mapInitialized = true;
             }
             App.app.location = new LatLng(location.getLatitude(), location.getLongitude());
             if (App.app.WaypointList != null) {
                 ArrayList<LatLng> totalDistPoints = App.app.WaypointList;
-                totalDistPoints.add(0,App.app.location);
+                totalDistPoints.add(0, App.app.location);
                 Double distance = MapFunctions.totalDistance(totalDistPoints);
-                Double time = distance/5280*18;
-                long hour = (long)Math.floor(time/60);
-                long minutes = (long)Math.ceil(time%60);
+                Double time = distance / 5280 * 18;
+                long hour = (long) Math.floor(time / 60);
+                long minutes = (long) Math.ceil(time % 60);
                 String text = hour + " hr " + minutes + " min";
                 remaining.setText(text);
 
                 //TODO I THOUGHT I CLEARED TEH MAP WHEN YOU SEARCHED DIRECTIONS...
+                double arbitraryDist = 500;
+                Double angle = MapFunctions.determineAngle(App.app.WaypointList.get(0), App.app.WaypointList.get(1), arbitraryDist);
+                ArrayList<LatLng> points = MapFunctions.determineOffsets(App.app.WaypointList.get(0), angle);
 
-                //REMOVE WAYPOINT IF YOU REACHED IT
-                Double checkDistance = MapFunctions.calculateDistance(App.app.location,App.app.WaypointList.get(0));
-                Double newInstruction = MapFunctions.calculateDistance(App.app.location,App.app.directionList.get(0).first);
-                if (newInstruction < 20){
-                    App.app.directionList.remove(0);
-                    directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
-                }
-                if (checkDistance < 20) { //MAYBRE CHANGE TO A CLSOER DISTANCE, 40 IS PRETTY FAR.
+
+                Double checkDistance1 = MapFunctions.calculateDistance(App.app.location, points.get(0));
+                Double checkDistance2 = MapFunctions.calculateDistance(App.app.location, points.get(1));
+
+                if (checkDistance1 < 20 || checkDistance2 < 20) { //OFFSET DISTANCES PERPENDICULAR TO THE POINT SO WE GET BETTER RESOLUTION
+                    //COMPARE POINT WITH THE POINT ON THE DIRECTION LIST, IF SIMILAR REOVE THE DIRECTION POINT
+                    Double samePoint = MapFunctions.calculateDistance(App.app.WaypointList.get(0), App.app.directionList.get(0).first);
                     App.app.previousWaypoint = App.app.WaypointList.get(0);
                     App.app.WaypointList.remove(0);
+                    if (samePoint < 10) {
+                        App.app.directionList.remove(0);
+                        directionView.setText(Html.fromHtml(App.app.directionList.get(0).second));
+                    }
                 }
 
 
-                MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
-
-                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList.get(0),App.app.location,checkDistance);
+                Double DistToWaypoint = MapFunctions.calculateDistance(App.app.location, App.app.WaypointList.get(0));
+                Double NorthAngle = MapFunctions.determineAngle(App.app.WaypointList.get(0), App.app.location, DistToWaypoint); //TODO CHECK THAT THESE ANGLES MATCH UP WITH WHAT THEY SHOULD
                 Log.d("ANGLE", NorthAngle.toString());
-                if (App.app.previousLocation != null) {
-                    Double heading = MapFunctions.determineAngle(App.app.location,App.app.previousLocation,200);
-                    CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,360 - heading.floatValue());
 
 
+                //if (App.app.previousLocation != null) {
+                //  Double heading = MapFunctions.determineAngle(App.app.location,App.app.previousLocation,200);
+                //CameraPosition camPos = new CameraPosition(App.app.location,16.0f,0,360 - heading.floatValue());
+                // TODO CALCULATE WHAT SHOULD VIBRATE BASED ON HEADING
+                Double currentBearing = 0.0;
+                if (App.app.pastLocations.size() == 1) {
+                    //COMPASS DATA IS HEADING
+                    currentBearing = new Double(App.app.heading);
 
-                    map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
-
+                } else {
+                    for (int i = 0; i < App.app.pastLocations.size() - 1; i++) {
+                        currentBearing += MapFunctions.determineAngle(App.app.pastLocations.get(i), App.app.pastLocations.get(i + 1), 500);
+                    }
+                    currentBearing = currentBearing / 3;
                 }
+                CameraPosition camPos = new CameraPosition(App.app.location, 16.0f, 0, 360 - currentBearing.floatValue());
+                MapFunctions.clearMapRedraw(map, App.app.location, App.app.WaypointList);
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
 
 
                 //WRITE ANGLE TO BLUETOOTH
+                NorthAngle = NorthAngle - currentBearing; //BEARING ACCOUNTING FOR HEADING.
                 String writeString = "angle@" + String.valueOf(NorthAngle.intValue()) + "!";
+
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
-                Log.d("NULL",b.toString());
-                if (App.app.mConnectThread != null &&  App.app.mConnectThread.mConnectedThread != null) {
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
                     App.app.mConnectThread.mConnectedThread.write(b);
-                }
-                else {
-                    Log.d("DIDN't WRITE","THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
+                } else {
+                    Log.d("DIDN't WRITE", "THIS DIDNT WRITE< BLUETOOTH IS NOT CONNECTED");
                 }
             }
-
+        }
             //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
             //your code here
-        }
+
 
         public void onProviderEnabled(String Provider){
             Log.d("YO","PROVIDER ENABLED");
