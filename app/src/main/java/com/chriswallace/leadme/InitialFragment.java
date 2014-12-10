@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -106,49 +108,60 @@ public class InitialFragment extends Fragment {
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
             public boolean onQueryTextChange(String newText) {
                 // this is your adapter that will be filtered
-
-                HTTPFunctions http = new HTTPFunctions(getActivity());
-                if (newText != null) {
-                    //if (open) {
+                if (!App.app.demo) {
+                    if (newText != null) {
+                        //if (open) {
+                        Log.d("TEST", getActivity().toString());
+                        HTTPFunctions http = new HTTPFunctions(getActivity());
                         Log.d("TEST", newText);
                         http.autocompleteSearch(newText);
                         results.setVisibility(View.VISIBLE);
                         results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
                                 App.app.destinations));
 
-                    //}
-                    //TODO Add a new thread to update that list
-                    open = true;
+                        //}
+                        //TODO Add a new thread to update that list
+                        open = true;
+                    }
                 }
-                return true;
+                    return true;
+
             }
 
 
 
             public boolean onQueryTextSubmit(String query) {
 
-                    //SHOULD I CLEAR TEXT??
-                    App.app.destination = query;
-                    if (App.app.WaypointList != null){
-                        App.app.WaypointList.clear();
+                //SHOULD I CLEAR TEXT??
+                App.app.destination = query;
+                if (App.app.WaypointList != null) {
+                    App.app.WaypointList.clear();
+                }
+                if(!query.equals("demo")) {
+
+                HTTPFunctions http = new HTTPFunctions(getActivity());
+                http.directionSearch(query, false);
+                searchedText = query;
+                //TODO DONT DISPLAY START UNTIL RESULTS LOAD
+                start.setVisibility(View.VISIBLE);
+                cancel.setVisibility(View.VISIBLE);
+                App.app.destinations.clear();
+
+                results.setVisibility(View.INVISIBLE);
+                if (query.equals("test")) {
+                    String writeString = "test!"; //TEST FUNCTIONALITY
+                    byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                    Log.d("NULL", b.toString());
+                    if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                        App.app.mConnectThread.mConnectedThread.write(b);
                     }
-
-                    HTTPFunctions http = new HTTPFunctions(getActivity());
-                    http.directionSearch(query, false);
-                    searchedText = query;
-                    //TODO DONT DISPLAY START UNTIL RESULTS LOAD
-                    start.setVisibility(View.VISIBLE);
-                    cancel.setVisibility(View.VISIBLE);
-                    App.app.destinations.clear();
-
-                    results.setVisibility(View.INVISIBLE);
-                     if (query.equals("test")) {
-                         String writeString = "test!"; //TEST FUNCTIONALITY
-                         byte[] b = writeString.getBytes(Charset.forName("ASCII"));
-                         Log.d("NULL", b.toString());
-                         if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
-                             App.app.mConnectThread.mConnectedThread.write(b);
-                         }
+                }
+            }
+                    else if (query.equals("demo")){
+                         App.app.demo = true;
+                         Log.d("DEMOOO","FDSFSDFSFFFF");
+                         MainActivity activity = (MainActivity)getActivity();
+                        activity.changeToDemoFrag();
                      }
                     InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
                         Context.INPUT_METHOD_SERVICE);

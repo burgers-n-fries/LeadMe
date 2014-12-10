@@ -3,6 +3,8 @@ package com.chriswallace.leadme;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -52,8 +54,9 @@ public class MainActivity extends FragmentActivity implements SensorEventListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-
+            App.app.fragment = "Map";
             getFragmentManager().beginTransaction()
+
                     .add(R.id.container, new InitialFragment(),"Map")
                     .commit();
         }
@@ -118,6 +121,25 @@ public class MainActivity extends FragmentActivity implements SensorEventListene
 
     }
 
+    public void changeToDemoFrag() {
+        App.app.fragment = "Demo";
+        DemoFragment fragment = new DemoFragment();
+
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.container, fragment, "Demo");
+        transaction.commit();
+    }
+
+    public void changeToMainFrag() {
+        App.app.fragment = "Map";
+        InitialFragment fragment = new InitialFragment();
+
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.commit();
+    }
 
 
 
