@@ -199,6 +199,7 @@ public class InitialFragment extends Fragment {
         results = (ListView) rootView.findViewById(R.id.autocomplete);
         directionView = (TextView) rootView.findViewById(R.id.directionDisplay);
 
+
         setHasOptionsMenu(true);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
