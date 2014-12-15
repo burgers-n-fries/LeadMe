@@ -37,4 +37,37 @@
         android:text="stop"
         android:id="@+id/stop"
         android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MotorOne"
+        android:id="@+id/one" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MotorTwo"
+        android:id="@+id/two"
+        android:layout_gravity="right" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MotorThree"
+        android:id="@+id/three" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Motor4"
+        android:id="@+id/Four"
+        android:layout_gravity="right" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MotorFive"
+        android:id="@+id/five" />
+
 </LinearLayout>

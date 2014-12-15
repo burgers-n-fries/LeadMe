@@ -42,6 +42,11 @@ public class DemoFragment extends Fragment {
     Button right;
     Button back;
     Button stop;
+    Button one;
+    Button two;
+    Button three;
+    Button four;
+    Button five;
 
 
 
@@ -78,11 +83,89 @@ public class DemoFragment extends Fragment {
         left = (Button) rootView.findViewById(R.id.left);
         right = (Button) rootView.findViewById(R.id.right);
         stop = (Button) rootView.findViewById(R.id.stop);
+        one = (Button) rootView.findViewById(R.id.one);
+        two = (Button) rootView.findViewById(R.id.two);
+        three = (Button) rootView.findViewById(R.id.three);
+        four = (Button) rootView.findViewById(R.id.Four);
+        five = (Button) rootView.findViewById(R.id.five);
 
 
 
 
+        one.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "angle@0!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
 
+
+            }
+        });
+
+        two.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "angle@72!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
+
+
+            }
+        });
+
+        three.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "angle@144!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
+
+
+            }
+        });
+
+        four.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "angle@216!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
+
+
+            }
+        });
+
+        five.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "angle@288!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
+
+
+            }
+        });
 
 
         stop.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +190,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@0!"; //TEST FUNCTIONALITY
+                String writeString = "angle@144!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -122,7 +205,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@180!"; //TEST FUNCTIONALITY
+                String writeString = "angle@322!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -137,7 +220,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@270!"; //TEST FUNCTIONALITY
+                String writeString = "angle@232!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -152,7 +235,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@90!"; //TEST FUNCTIONALITY
+                String writeString = "angle@54!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
