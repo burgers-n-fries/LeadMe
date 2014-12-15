@@ -47,6 +47,7 @@ public class DemoFragment extends Fragment {
     Button three;
     Button four;
     Button five;
+    Button test;
 
 
 
@@ -88,9 +89,23 @@ public class DemoFragment extends Fragment {
         three = (Button) rootView.findViewById(R.id.three);
         four = (Button) rootView.findViewById(R.id.Four);
         five = (Button) rootView.findViewById(R.id.five);
+        test = (Button) rootView.findViewById((R.id.test));
 
 
+        test.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View v) {
+                String writeString = "test!"; //TEST FUNCTIONALITY
+                byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                Log.d("NULL", b.toString());
+                if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                    App.app.mConnectThread.mConnectedThread.write(b);
+                }
 
+
+            }
+        });
 
         one.setOnClickListener(new View.OnClickListener() {
             MainActivity activity = (MainActivity)getActivity();
@@ -190,7 +205,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@144!"; //TEST FUNCTIONALITY
+                String writeString = "angle@322!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -205,7 +220,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@322!"; //TEST FUNCTIONALITY
+                String writeString = "angle@144!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -220,7 +235,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@232!"; //TEST FUNCTIONALITY
+                String writeString = "angle@54!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
@@ -235,7 +250,7 @@ public class DemoFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View v) {
-                String writeString = "angle@54!"; //TEST FUNCTIONALITY
+                String writeString = "angle@232!"; //TEST FUNCTIONALITY
                 byte[] b = writeString.getBytes(Charset.forName("ASCII"));
                 Log.d("NULL", b.toString());
                 if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
