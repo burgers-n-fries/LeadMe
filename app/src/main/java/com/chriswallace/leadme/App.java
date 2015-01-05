@@ -3,6 +3,7 @@ package com.chriswallace.leadme;
 import android.app.Application;
 import android.bluetooth.BluetoothDevice;
 import android.util.Pair;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -32,6 +33,7 @@ public class App extends Application {
     Float heading; //COMPASS HEADING ONLY USED IN INITIALIZATION;
     String fragment;
     Boolean demo;
+    ListView autoComplete;
 
     ArrayList<Pair<LatLng,String>> directionList;
     @Override
@@ -49,6 +51,7 @@ public class App extends Application {
         this.pastLocations = new ArrayList<LatLng>();
         this.heading = new Float(0.0);
         this.demo = false;
+        this.autoComplete = null;
         app = this;
     }
 

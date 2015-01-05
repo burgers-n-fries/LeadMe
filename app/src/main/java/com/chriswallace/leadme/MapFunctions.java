@@ -118,13 +118,16 @@ public class MapFunctions {
     }
 
     public static void clearMapRedraw(GoogleMap map, LatLng center ,ArrayList<LatLng> waypoints) {
+        Log.d("ATTEMPTING TO CLEAR MAP","DID IT CLEAR");
         map.clear();
+
         if (waypoints == null) {
             Log.d("Logging", "CLEARING MAP");
         } else {
             int i;
             PolylineOptions route = new PolylineOptions();
             route.color(0xFF0000FF);
+            Log.d("THIS IS THE LIST OF POINTS WHEN INITILIAZED",route.getPoints().toString());
             for (i = 0; i < waypoints.size(); i++) {
 
                 route.add(waypoints.get(i));
