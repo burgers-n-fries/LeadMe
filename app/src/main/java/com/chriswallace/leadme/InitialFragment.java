@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -61,7 +63,7 @@ public class InitialFragment extends Fragment {
     GoogleMap map;
     Button start;
     Button cancel;
-    ListView results;
+
     View StatusBar;
     Boolean open;
     SearchView searchView;
@@ -82,14 +84,18 @@ public class InitialFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu , MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         super.onCreateOptionsMenu(menu, inflater);
-        results.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        App.app.autoComplete.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                App.app.destinations));
+        App.app.autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                String selectedFromList = (results.getItemAtPosition(position)).toString();
-                searchView.setQuery(selectedFromList,true);
+                String selectedFromList = (App.app.autoComplete.getItemAtPosition(position)).toString();
+                searchView.setQuery(selectedFromList, true);
                 searchView.clearFocus();
-                results.setVisibility(View.INVISIBLE);
+                App.app.autoComplete.setVisibility(View.INVISIBLE);
                 App.app.destinations.clear();
+                ((ArrayAdapter) App.app.autoComplete.getAdapter()).notifyDataSetChanged();
 
             }
         });
@@ -106,32 +112,36 @@ public class InitialFragment extends Fragment {
         SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
             public boolean onQueryTextChange(String newText) {
                 // this is your adapter that will be filtered
-
-                HTTPFunctions http = new HTTPFunctions(getActivity());
-                if (newText != null) {
-                    //if (open) {
+                if (!App.app.demo) {
+                    if (newText != null) {
+                        //if (open) {
+                        Log.d("TEST", getActivity().toString());
+                        HTTPFunctions http = new HTTPFunctions(getActivity());
                         Log.d("TEST", newText);
                         http.autocompleteSearch(newText);
-                        results.setVisibility(View.VISIBLE);
-                        results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
-                                App.app.destinations));
+                        App.app.autoComplete.setVisibility(View.VISIBLE);
+                        //results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                        //      App.app.destinations));
 
-                    //}
-                    //TODO Add a new thread to update that list
-                    open = true;
+                        //}
+                        //TODO Add a new thread to update that list
+                        open = true;
+                    }
                 }
                 return true;
+
             }
 
 
 
             public boolean onQueryTextSubmit(String query) {
 
-                    //SHOULD I CLEAR TEXT??
-                    App.app.destination = query;
-                    if (App.app.WaypointList != null){
-                        App.app.WaypointList.clear();
-                    }
+                //SHOULD I CLEAR TEXT??
+                App.app.destination = query;
+                if (App.app.WaypointList != null) {
+                    App.app.WaypointList.clear();
+                }
+                if(!query.equals("demo")) {
 
                     HTTPFunctions http = new HTTPFunctions(getActivity());
                     http.directionSearch(query, false);
@@ -140,21 +150,24 @@ public class InitialFragment extends Fragment {
                     start.setVisibility(View.VISIBLE);
                     cancel.setVisibility(View.VISIBLE);
                     App.app.destinations.clear();
+                    ((ArrayAdapter)App.app.autoComplete.getAdapter()).notifyDataSetChanged();
 
-                    results.setVisibility(View.INVISIBLE);
-                     if (query.equals("test")) {
-                         String writeString = "test!"; //TEST FUNCTIONALITY
-                         byte[] b = writeString.getBytes(Charset.forName("ASCII"));
-                         Log.d("NULL", b.toString());
-                         if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
-                             App.app.mConnectThread.mConnectedThread.write(b);
-                         }
-                     }
-                    InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-                    return true;
+                    App.app.autoComplete.setVisibility(View.INVISIBLE);
+                    if (query.equals("test")) {
+                        String writeString = "test!"; //TEST FUNCTIONALITY
+                        byte[] b = writeString.getBytes(Charset.forName("ASCII"));
+                        Log.d("NULL", b.toString());
+                        if (App.app.mConnectThread != null && App.app.mConnectThread.mConnectedThread != null) {
+                            App.app.mConnectThread.mConnectedThread.write(b);
+                        }
+                    }
                 }
+
+                InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                return true;
+            }
 
         };
         searchView.setOnQueryTextListener(queryTextListener);
@@ -183,8 +196,9 @@ public class InitialFragment extends Fragment {
         StatusBar = rootView.findViewById(R.id.statusbar);
         start = (Button) rootView.findViewById(R.id.Start);
         cancel = (Button) rootView.findViewById(R.id.Cancel);
-        results = (ListView) rootView.findViewById(R.id.autocomplete);
+        App.app.autoComplete = (ListView) rootView.findViewById(R.id.autocomplete);
         directionView = (TextView) rootView.findViewById(R.id.directionDisplay);
+
 
         setHasOptionsMenu(true);
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
@@ -207,7 +221,7 @@ public class InitialFragment extends Fragment {
                 InputMethodManager imm = (InputMethodManager) App.app.getApplicationContext().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-                results.setVisibility(View.INVISIBLE);
+                App.app.autoComplete.setVisibility(View.INVISIBLE);
             }
         });
         Log.d("MAP",map.toString());
@@ -250,7 +264,7 @@ public class InitialFragment extends Fragment {
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.291022, -71.265235), 12.0f));
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 4, mLocationListener); //ADJUST TO BALANCE PERFORMANCE WITH ABTTERY LIFE
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,3000,4,coarseLocationListener);
-           // MapsInitializer.initialize(this.getActivity());
+        // MapsInitializer.initialize(this.getActivity());
 
 
 
@@ -310,9 +324,9 @@ public class InitialFragment extends Fragment {
                 directionView.setVisibility(View.INVISIBLE);
                 searchView.setQuery("", false);
                 App.app.directionList.clear();
-                results.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
+                App.app.autoComplete.setAdapter(new AutocompleteAdapter(getActivity(), R.layout.results_layout,
                         App.app.destinations));
-                results.setVisibility(View.INVISIBLE);
+                App.app.autoComplete.setVisibility(View.INVISIBLE);
 
                 StatusBar.setVisibility(View.INVISIBLE);
                 activity.getActionBar().show();
@@ -434,8 +448,8 @@ public class InitialFragment extends Fragment {
                 }
             }
         }
-            //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
-            //your code here
+        //MapFunctions.drawCircle(map,activity.location); //CHANGE COLOR, MAYBE ADD SCALING FACOTR BASED ON ZOOM LEVEL, ALSO DELETE IT, SO CLEAR THE MAP, THEN REDRAW IT WITH NEW PATH AS WELL
+        //your code here
 
 
         public void onProviderEnabled(String Provider){

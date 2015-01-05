@@ -3,6 +3,7 @@ package com.chriswallace.leadme;
 import android.app.Fragment;
 import android.content.Context;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -39,7 +40,7 @@ public class HTTPFunctions {
         String URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
         text = text.replaceAll(" ", "+");
         URL = "https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=AIzaSyCWaaIJ91rA98zqVpN0GLpLdaNKcAl7HbY&input=" + text;
-
+        Log.d("THIS IS OUR TEXT",text);
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -47,14 +48,36 @@ public class HTTPFunctions {
 
                         try {
                             int i;
+                            Log.d("ztest",response.toString());
                             Log.d("YOLO",App.app.destinations.toString());
                             App.app.destinations.clear();
-                            for (i = 0; i < 3; i++) {
-                                JSONArray predictions = response.getJSONArray("predictions");
-                                JSONObject description = predictions.getJSONObject(i);
-                                App.app.destinations.add(description.getString("description"));
-                            }
 
+                            if (response.get("status").equals("OK")){
+
+                                final JSONArray predictions = response.getJSONArray("predictions");
+
+
+                                activity.runOnUiThread(new Runnable() {
+                                    //ALL VIEW PDATES MUST BE RUN ON UI THREAD
+                                    @Override
+                                    public void run() {
+                                        ((ArrayAdapter) App.app.autoComplete.getAdapter()).clear();
+                                        for (int i = 0; i < 3; i++) {
+                                            try{
+                                                JSONObject description = predictions.getJSONObject(i);
+                                                //App.app.destinations.add(description.getString("description"));
+                                                // ((ArrayAdapter) App.app.autoComplete.getAdapter()).add(App.app.destinations.get(i));
+                                                ((ArrayAdapter) App.app.autoComplete.getAdapter()).add(description.getString("description"));
+                                            }
+                                            catch(JSONException e){
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+                                    }
+                                });
+
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -109,5 +132,3 @@ public class HTTPFunctions {
 
     }
 }
-
-
