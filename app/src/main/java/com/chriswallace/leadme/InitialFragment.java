@@ -204,7 +204,7 @@ public class InitialFragment extends Fragment {
         //MapView mMap = (MapView) rootView.findViewById(R.id.map);
         //mMap.onCreate(savedInstanceState);
         //GoogleMap map = mMap.getMap();
-        MapFragment frag = (MapFragment)getActivity().getFragmentManager().findFragmentById(R.id.map);
+        MapFragment frag = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map));
 
         mapV = frag.getView();
         //MapView frag = (MapView)rootView.findViewById(R.id.map);
